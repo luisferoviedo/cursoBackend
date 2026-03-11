@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Hamburgueseria Luisfer</title>
+
+  <link rel="stylesheet" href="css/styles.css">
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f7f7f7;
+      color: #333;
+      margin: 0;
+      padding: 0;
+      line-height: 1.5;
+    }
+    header {
+      background-color: #2c2c2c;
+      color: #fff;
+      text-align: center;
+      padding: 24px 16px;
+    }
+    main {
+      max-width: 720px;
+      margin: 24px auto;
+      padding: 0 16px 32px;
+    }
+    form {
+      background: #fff;
+      padding: 24px;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    }
+    fieldset {
+      border: 1px solid #ddd;
+      padding: 16px;
+      margin-bottom: 16px;
+      border-radius: 6px;
+    }
+    legend {
+      font-weight: 600;
+      padding: 0 8px;
+    }
+    label {
+      display: inline-block;
+      margin: 8px 0 4px;
+    }
+    input, select, textarea {
+      width: 100%;
+      padding: 8px 10px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      box-sizing: border-box;
+    }
+    input[type="checkbox"],
+    input[type="radio"] {
+      width: auto;
+      margin-right: 8px;
+    }
+    button {
+      background-color: #e53935;
+      color: #fff;
+      border: none;
+      padding: 10px 16px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-weight: 600;
+    }
+    button:hover {
+      background-color: #c62828;
+    }
+  </style>
+</head>
+
+<body>
+  <header>
+    <h1>Hamburgueseria Luisfer</h1>
+    <h3>¡Bienvenido a nuestra hamburguesería!</h3>
+    <p>¡Disfruta de las mejores hamburguesas de Medellin!</p>
+  </header>
+
+  <main>
+    <!-- Formulario principal del pedido -->
+    <form action="" method="post">
+      <!-- Datos básicos del cliente -->
+      <fieldset>
+        <legend> Datos del cliente </legend>
+
+        <label for="nombre">Nombre Completo:</label> <br>
+        <input type="text" id="nombre" name="nombre" autocomplete="name" required>
+        <br>
+        <label for="correo">Correo Electrónico:</label> <br>
+        <input type="email" id="correo" name="correo" autocomplete="email" required>
+        <br>
+        <label for="telefono">Teléfono Celular:</label> <br>
+        <input type="tel" id="telefono" name="telefono" maxlength="10" inputmode="numeric" required>
+        <br>
+      </fieldset>
+
+      <!-- Detalles del pedido y extras -->
+      <fieldset>
+        <legend>Pedido</legend>
+
+        <p><strong>Hamburguesas</strong></p>
+
+        <label for="hamburguesa1">Hamburguesa 1:</label><br>
+        <select id="hamburguesa1" name="hamburguesa1" required>
+          <option value="">-- Selecciona una --</option>
+          <option value="clasica">La Clásica</option>
+          <option value="queso">La cipotuda con doble carne</option>
+          <option value="tocino">La amigable vegetariana</option>
+        </select><br><br>
+
+        <label for="cantidad1">Cantidad:</label><br>
+        <input type="number" id="cantidad1" name="cantidad1" min="1" max="5" step="1" value="1" required>
+        <br><br>
+
+        <label for="hamburguesa2">Hamburguesa 2 (opcional):</label><br>
+        <select id="hamburguesa2" name="hamburguesa2">
+          <option value="">-- Selecciona una --</option>
+          <option value="clasica">La Clásica</option>
+          <option value="queso">La cipotuda con doble carne</option>
+          <option value="tocino">La amigable vegetariana</option>
+        </select><br><br>
+
+        <label for="cantidad2">Cantidad (opcional):</label><br>
+        <input type="number" id="cantidad2" name="cantidad2" min="1" max="5" step="1">
+        <br><br>
+
+        <label for="hamburguesa3">Hamburguesa 3 (opcional):</label><br>
+        <select id="hamburguesa3" name="hamburguesa3">
+          <option value="">-- Selecciona una --</option>
+          <option value="clasica">La Clásica</option>
+          <option value="queso">La cipotuda con doble carne</option>
+          <option value="tocino">La amigable vegetariana</option>
+        </select><br><br>
+
+        <label for="cantidad3">Cantidad (opcional):</label><br>
+        <input type="number" id="cantidad3" name="cantidad3" min="1" max="5" step="1">
+        <br><br>
+
+        <hr>
+
+        <label>Extras (para todo el pedido):</label><br>
+        <input type="checkbox" id="queso_extra" name="extras[]" value="queso_extra">
+        <label for="queso_extra">Queso Extra</label><br>
+
+        <input type="checkbox" id="tocino" name="extras[]" value="tocino">
+        <label for="tocino">Tocino</label><br>
+
+        <input type="checkbox" id="huevo" name="extras[]" value="huevo">
+        <label for="huevo">Huevo</label><br><br>
+
+        <p>Nos preocupa tu seguridad y tus comentarios, por lo cual en este espacio puedes escribirnos alguna indicación adicional</p>
+
+        <label for="indicaciones">Indicaciones adicionales:</label><br>
+        <textarea id="indicaciones" name="indicaciones" rows="4" cols="50" placeholder="Escribe aquí tus indicaciones..."></textarea>
+        <br><br>
+      </fieldset>
+      <!-- Dirección y método de pago -->
+      <fieldset>
+        <legend>Entrega y Pago</legend>
+        <br>
+        <label for="direccion">Dirección:</label>
+        <input type="text" id="direccion" name="direccion" required>
+        <br><br>
+        <legend> Método de Pago </legend>
+        <input type="radio" id="efectivo" name="metodo_pago" value="efectivo" required>
+        <label for="efectivo">Efectivo</label>
+        <br>
+        <input type="radio" id="tarjeta" name="metodo_pago" value="tarjeta" required>
+        <label for="tarjeta">Tarjeta de Crédito/Débito</label>
+        <br>
+        <input type="radio" id="app_pago" name="metodo_pago" value="app_pago" required>
+        <label for="app_pago">App de Pago (Nequi, Daviplata, etc.)</label>
+        <br><br>
+        <button type="submit">Realizar pedido</button>
+      </fieldset>
+    </form>
+  </main>
+  <footer>
+    <p>© 2026 Hamburgueseria Luisfer. Todos los derechos reservados.</p>
+  </footer>
+</body>
+</html>

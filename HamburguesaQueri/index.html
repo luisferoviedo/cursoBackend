@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Hamburguesas El Queri</title>
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+
+<body>
+<!-- Header + NAV )( Semantic)-->
+  <header class="site-header">
+    <div class="site-header__brand">
+      <h1 class="site-header__title">Hamburguesas El Queri 🍔</h1>
+    </div>
+
+    <nav class="site-header__nav" aria-label="Navegacion principal">
+      <a class="site-header__link" href="#inicio">Inicio</a>
+      <a class="site-header__link" href="#menu">Menú</a>
+      <a class="site-header__link" href="#reservas">Reservas</a>
+      <a class="site-header__link" href="#info">Información</a>
+    </nav>
+  </header>
+
+<!-- Main -->
+<main class="container">
+  <section id="inicio" class="section hero" aria-labelledby="titulo-banner">
+    <div class="hero__text">
+    <h1 class="hero__title" id="titulo-banner">Bienvenidos a Hamburguesas El Queri</h1>
+    <p>Disfruta de las mejores hamburguesas de la ciudad, hechas con diseño Responsive para todos los paladares.</p>
+    <a class="btn" href="#menu">Ver menú</a>
+    </div>
+
+    <img class="hero__image" src="assets/img/banner.jpg" alt="Banner de Hamburguesas El Queri">
+  </section>
+
+<section class="section" aria-labelledby="titulo-populares">
+  <h2 class="section__title" id="titulo-populares">Hamburguesas Populares</h2>
+
+  <div class="cards">
+    <article class="cards__item card">
+      <h3 class="cards__title">La Especial</h3>
+      <p>Carne 150g, queso cheddar, lechuga, tomate, cebolla y nuestra salsa especial.</p>
+      <p><strong>Precio:</strong> $18.000</p>
+      <button class="btn" type="button">Pedir</button>
+    </article>
+
+    <article class="cards__item card">
+      <h3 class="cards__title">La BBQ</h3>
+      <p>Carne 150g, queso cheddar, tocino crujiente, cebolla caramelizada y salsa BBQ.</p>
+      <p><strong>Precio:</strong> $20.000</p>
+      <button class="btn" type="button">Pedir</button>
+    </article>
+
+    <article class="cards__item card">
+      <h3 class="cards__title">La Veggie</h3>
+      <p>Hamburguesa de garbanzos 150g, lechuga, tomate, aguacate y mayonesa vegana.</p>
+      <p><strong>Precio:</strong> $15.000</p>
+      <button class="btn" type="button">Pedir</button>
+    </article>
+  </div>
+</section>
+
+  <section id="menu" class="section section--tight" aria-labelledby="titulo-menu">
+    <h2 class="section__title" id="titulo-menu">Menú Completo</h2>
+    <p>Explora nuestra selección completa de hamburguesas artesanales.</p>
+
+    <h3 class="section__subtitle">Hamburguesas</h3>
+
+    <div class="menu-cards">
+      <article class="menu-cards__item card card--compact">
+        <h3 class="menu-cards__title">Nuestras Hamburguesas</h3>
+        <ol class="list">
+          <li class="list__item">La Clasica: Carne 150g, queso cheddar, lechuga, tomate, cebolla $18.000</li>
+          <li class="list__item">La BBQ: Carne 150g, queso cheddar, tocino crujiente, cebolla caramelizada, salsa BBQ $20.000</li>
+          <li class="list__item">La Veggie: Hamburguesa de garbanzos 150g, lechuga, tomate, aguacate y mayonesa vegana $15.000</li>
+          <li class="list__item">La Doble Queso: Carne 150g, doble queso cheddar, lechuga, tomate y cebolla $22.000</li>
+          <li class="list__item">La Picante: Carne 150g, queso pepper jack, jalapeños, lechuga, tomate y salsa picante $19.000</li>
+        </ol>
+      </article>
+
+      <article class="menu-cards__item card card--compact">
+        <h3 class="menu-cards__title">Postres</h3>
+        <ul class="list">
+          <li class="list__item">Helado de Vainilla: Dos bolas de helado de vainilla en un cucurucho $5.000</li>
+          <li class="list__item">Brownie con Helado: Una porcion de brownie con helado de vainilla $10.000</li>
+          <li class="list__item">Cheesecake de Fresa Una tarta deliciosa $6.000</li>
+        </ul>
+      </article>
+
+      <article class="menu-cards__item card card--compact">
+        <h3 class="menu-cards__title">Bebidas</h3>
+        <ul class="list">
+          <li class="list__item">Refresco de Cola de 350mL $6.000</li>
+          <li class="list__item">Agua Mineral de 305mL $6.000</li>
+          <li class="list__item">Cerveza Artesanal de 350mL $8.000</li>
+        </ul>
+      </article>
+
+      <article class="menu-cards__item card card--compact">
+        <h3 class="menu-cards__title">Acompañamientos</h3>
+        <ul class="list">
+          <li class="list__item">Papas Fritas 120g $4.000</li>
+          <li class="list__item">Aros de Cebolla 120g $4.000</li>
+          <li class="list__item">Ensalada César 150g $5.000</li>
+        </ul>
+      </article>
+    </div>
+
+    <h3 class="section__subtitle">Tabla de productos</h3>
+    <table>
+      <thead>
+        <tr>
+          <th>Producto</th>
+          <th>Ingredientes</th>
+          <th>Precio</th>
+          <th>Picante / Categoria</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>La Clasica</td>
+          <td>Carne 150g, queso cheddar, lechuga, tomate, cebolla</td>
+          <td>$18.000</td>
+          <td>No picante</td>
+        </tr>
+        <tr>
+          <td>La BBQ</td>
+          <td>Carne 150g, queso cheddar, tocino crujiente, cebolla caramelizada, salsa BBQ</td>
+          <td>$20.000</td>
+          <td>No picante</td>
+        </tr>
+        <tr>
+          <td>La Picante</td>
+          <td>Carne 150g, queso pepper jack, jalapeños, lechuga, tomate, salsa picante</td>
+          <td>$19.000</td>
+          <td>Sí picante</td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+
+  <section id="reservas" class="section section--tight" aria-labelledby="titulo-reservas">
+    <h2 class="section__title" id="titulo-reservas">Reservas</h2>
+    <p>Para reservar una mesa, por favor contáctanos al +34 123 456 789 o envíanos un correo a info@hamburguesaselqueri.com</p>
+
+    <form class="form" action="#" method="post">
+      <div class="form__field">
+        <label class="form__label" for="nombre">Nombre:</label>
+        <input class="form__control" type="text" id="nombre" name="nombre" placeholder="Escribe tu nombre" required />
+      </div>
+
+      <div class="form__field">
+        <label class="form__label" for="fecha">Fecha:</label>
+        <input class="form__control" type="date" id="fecha" name="fecha" required />
+      </div>
+
+      <div class="form__field">
+        <label class="form__label" for="hora">Hora:</label>
+        <input class="form__control" type="time" id="hora" name="hora" required />
+      </div>
+
+      <div class="form__field">
+        <label class="form__label" for="personas">Número de personas:</label>
+        <input class="form__control" type="number" id="personas" name="personas" min="1" max="20" required />
+      </div>
+
+      <div class="form__field">
+        <label class="form__label" for="sede">Sede:</label>
+        <select class="form__control" id="sede" name="sede" required>
+          <option value="">Selecciona una sede</option>
+          <option value="Laureles">Laureles</option>
+          <option value="Provenza">Provenza</option>
+          <option value="Envigado">Envigado</option>
+        </select>
+      </div>
+
+      <div class="form__field form__field--full">
+        <label class="form__label" for="comentarios">Comentarios adicionales:</label>
+        <textarea class="form__control form__control--textarea" id="comentarios" name="comentarios" placeholder="Escribe tus comentarios aquí..."></textarea>
+      </div>
+
+      <div class="form__actions form__field--full">
+        <button class="btn" type="submit">Reservar</button>
+        <button class="btn btn--ghost" type="reset">Limpiar</button>
+      </div>
+    </form>
+  </section>
+
+  <section id="info" class="section section--tight info" aria-labelledby="titulo-info">
+    <h2 class="section__title" id="titulo-info">Información de Restaurantes</h2>
+
+    <div class="info__locations">
+      <article class="info__location card">
+        <h3 class="info__title">Sede Laureles</h3>
+        <p>Dirección: Calle 33 # 78-12, Medellín</p>
+        <p>Teléfono: +34 123 456 780</p>
+      </article>
+
+      <article class="info__location card">
+        <h3 class="info__title">Sede Provenza</h3>
+        <p>Dirección: Carrera 35 # 8A-20, Medellín</p>
+        <p>Teléfono: +34 123 456 781</p>
+      </article>
+
+      <article class="info__location card">
+        <h3 class="info__title">Sede Envigado</h3>
+        <p>Dirección: Avenida Las Vegas # 45-30, Envigado</p>
+        <p>Teléfono: +34 123 456 782</p>
+      </article>
+    </div>
+
+    <div class="info__social">
+      <h3 class="info__title">Redes Sociales</h3>
+      <p>Síguenos en nuestras redes sociales para estar al tanto de nuestras promociones y novedades:</p>
+      <ul class="list info__social-list">
+        <li class="list__item info__social-item">Facebook: @HamburguesaQueri</li>
+        <li class="list__item info__social-item">Instagram: @HamburguesaQueri</li>
+        <li class="list__item info__social-item">Twitter: @HamburguesaQueri</li>
+      </ul>
+    </div>
+
+  </section>
+
+</main>
+
+<footer>
+  <p>&copy; 2026 Hamburguesa Queri. Todos los derechos reservados.</p>
+</footer>
+</body>
+</html>

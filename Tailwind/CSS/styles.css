@@ -1,0 +1,136 @@
+:root {
+  --color-tiger-orange-50: #fdf2e8;
+  --color-tiger-orange-100: #fae5d1;
+  --color-tiger-orange-200: #f5cba3;
+  --color-tiger-orange-300: #f0b075;
+  --color-tiger-orange-400: #ec9646;
+  --color-tiger-orange-500: #e77c18;
+  --color-tiger-orange-600: #b96313;
+  --color-tiger-orange-700: #8a4a0f;
+  --color-tiger-orange-800: #5c320a;
+  --color-tiger-orange-900: #2e1905;
+  --color-tiger-orange-950: #201103;
+
+  --bg-color: var(--color-tiger-orange-50);
+  --surface-color: #fffaf5;
+  --text-color: var(--color-tiger-orange-500);
+  --muted-text-color: var(--color-tiger-orange-700);
+  --header-bg: var(--color-tiger-orange-300);
+  --header-text: var(--color-tiger-orange-950);
+  --footer-bg: var(--color-tiger-orange-300);
+  --footer-text: var(--color-tiger-orange-950);
+  --footer-text-muted: var(--color-tiger-orange-900);
+  --primary-color: var(--color-tiger-orange-700);
+  --primary-hover-color: var(--color-tiger-orange-800);
+  --social-bg: var(--color-tiger-orange-700);
+  --social-bg-hover: var(--color-tiger-orange-800);
+  --social-icon-color: var(--color-tiger-orange-100);
+}
+
+body.site-body {
+  background-color: var(--bg-color);
+  color: var(--text-color);
+}
+
+.site-nav {
+  background-color: var(--header-bg);
+  color: var(--header-text);
+}
+
+.site-nav a {
+  color: inherit;
+}
+
+.nav-link {
+  transition: color 0.2s ease;
+}
+
+.nav-link:hover {
+  color: var(--header-text);
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+}
+
+.site-content {
+  background-color: var(--surface-color);
+}
+
+.site-heading {
+  color: var(--color-tiger-orange-800);
+}
+
+.site-text {
+  color: var(--muted-text-color);
+}
+
+.site-button {
+  background-color: var(--primary-color);
+  color: #fff;
+  transition: background-color 0.2s ease;
+}
+
+.site-button:hover {
+  background-color: var(--primary-hover-color);
+}
+
+.site-footer {
+  background-color: var(--footer-bg);
+  color: var(--footer-text);
+}
+
+.site-footer-text {
+  color: var(--footer-text-muted);
+}
+
+.site-social {
+  background-color: var(--social-bg);
+  transition: all 0.3s ease;
+}
+
+.site-social:hover {
+  background-color: var(--social-bg-hover);
+}
+
+.footer-overlay {
+  background: linear-gradient(
+    to bottom right,
+    rgb(253 242 232 / 0.26),
+    rgb(240 176 117 / 0.2)
+  );
+}
+
+.footer-topline {
+  background: linear-gradient(
+    to right,
+    transparent,
+    var(--color-tiger-orange-600),
+    transparent
+  );
+}
+
+.brand-badge {
+  background: linear-gradient(
+    to bottom right,
+    var(--color-tiger-orange-400),
+    var(--color-tiger-orange-600)
+  );
+}
+
+.brand-name {
+  background: linear-gradient(
+    to right,
+    var(--color-tiger-orange-900),
+    var(--color-tiger-orange-700)
+  );
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.social-icon {
+  color: var(--social-icon-color);
+}
+
+.group:hover .social-icon {
+  color: #fff;
+}

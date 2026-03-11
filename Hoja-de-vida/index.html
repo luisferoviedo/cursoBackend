@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <title>Luis Oviedo Berrocal</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Portfolio de Luis Oviedo Berrocal, desarrollador en formación.">
+    <meta name="author" content="Luis Oviedo Berrocal">
+    <style>
+        :root {
+            color-scheme: light;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: "Helvetica Neue", Arial, sans-serif;
+            line-height: 1.6;
+            background-color: #f3f2ef;
+            color: #1f2937;
+        }
+
+        header {
+            background-color: #052e56;
+            color: #ffffff;
+            padding: 20px;
+            text-align: left;
+        }
+
+        header h1 {
+            margin: 0 0 4px;
+            font-size: 2rem;
+        }
+
+        header h2 {
+            margin: 0;
+            font-weight: 400;
+            font-size: 1rem;
+            color: #dbeafe;
+        }
+
+        nav ul {
+            list-style: none;
+            padding: 0;
+            margin: 14px 0 0;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: flex-start;
+            gap: 10px;
+        }
+
+        nav a {
+            color: #ffffff;
+            text-decoration: none;
+            font-weight: 600;
+            padding: 4px 8px;
+            border-radius: 6px;
+            transition: background-color 0.2s ease, color 0.2s ease;
+        }
+
+        nav a:hover {
+            background-color: rgba(255, 255, 255, 0.2);
+        }
+
+        main {
+            max-width: 980px;
+            margin: 0 auto;
+            padding: 24px 20px 40px;
+            display: grid;
+            grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
+            grid-template-areas:
+                "about aside"
+                "preferences aside"
+                "contact aside"
+                "projects aside";
+            gap: 24px;
+            align-items: start;
+        }
+
+        section,
+        aside {
+            background-color: #ffffff;
+            border-radius: 12px;
+            padding: 20px;
+            border: 1px solid #e5e7eb;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
+        }
+
+        aside {
+            grid-area: aside;
+            display: grid;
+            gap: 18px;
+        }
+
+        #about-me {
+            grid-area: about;
+        }
+
+        #preferences {
+            grid-area: preferences;
+        }
+
+        #contact {
+            grid-area: contact;
+        }
+
+        #projects {
+            grid-area: projects;
+        }
+
+        h3,
+        h4 {
+            margin-top: 0;
+            color: #111827;
+        }
+
+        ul {
+            padding-left: 20px;
+        }
+
+        li {
+            margin-bottom: 6px;
+        }
+
+        a {
+            color: #0a66c2;
+        }
+
+        a:hover {
+            color: #004182;
+        }
+
+        form {
+            display: grid;
+            gap: 12px;
+        }
+
+        #preferences form {
+            max-width: 560px;
+            margin: 0 auto;
+        }
+
+        label {
+            font-weight: 600;
+        }
+
+        fieldset label {
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        input[type="text"],
+        input[type="email"],
+        select,
+        textarea {
+            width: 100%;
+            padding: 10px 12px;
+            border-radius: 8px;
+            border: 1px solid #d1d5db;
+            font-size: 0.95rem;
+            font-family: inherit;
+            background-color: #ffffff;
+        }
+
+        input[type="text"]:focus,
+        input[type="email"]:focus,
+        select:focus,
+        textarea:focus {
+            outline: 2px solid #0a66c2;
+            outline-offset: 2px;
+            border-color: #0a66c2;
+        }
+
+        input[type="range"] {
+            width: 100%;
+        }
+
+        fieldset {
+            border: 1px solid #e5e7eb;
+            border-radius: 10px;
+            padding: 12px;
+            display: grid;
+            gap: 10px;
+        }
+
+        fieldset legend {
+            font-weight: 600;
+            padding: 0 6px;
+        }
+
+        button[type="submit"] {
+            align-self: flex-start;
+            background-color: #0a66c2;
+            color: #ffffff;
+            border: 1px solid #0a66c2;
+            border-radius: 8px;
+            padding: 10px 16px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        button[type="submit"]:hover {
+            background-color: #004182;
+        }
+
+        #projects article {
+            margin-top: 12px;
+        }
+
+        footer {
+            text-align: center;
+            padding: 18px;
+            background-color: transparent;
+            color: #6b7280;
+        }
+
+        @media (max-width: 840px) {
+            main {
+                grid-template-columns: 1fr;
+                grid-template-areas:
+                    "about"
+                    "preferences"
+                    "aside"
+                    "contact"
+                    "projects";
+            }
+
+            nav ul {
+                flex-direction: column;
+                align-items: center;
+            }
+        }
+    </style>
+</head>
+
+
+<body>
+    <!-- Primary site header with identity and main navigation -->
+    <header>
+        <h1>Luis Oviedo</h1>
+        <h2>Desarrollador en formación</h2>
+        <nav>
+            <ul>
+                <li><a href="#about-me">Sobre mí</a></li>
+                <li><a href="#formas-preferences">formulario</a></li>
+                <li><a href="#skills">Habilidades</a></li>
+                <li><a href="#projects">Proyectos</a></li>
+                <li><a href="#contact">Contacto</a></li>
+            </ul>
+        </nav>
+    </header>
+    <!-- Main content area -->
+    <main>
+        <!-- Main personal introduction section -->
+        <section id="about-me">
+            <h3>Sobre mí</h3>
+            <p>Soy Luis Fernando Oviedo Berrocal, un desarrollador en formación con pasión por la tecnología y la programación. Actualmente, estoy aprendiendo y mejorando mis habilidades en desarrollo web, con un enfoque en crear soluciones eficientes y atractivas.</p>
+            <p>Mi objetivo es convertirme en un desarrollador competente y contribuir a proyectos innovadores que tengan un impacto positivo en la sociedad.</p>
+        </section>
+        <!-- Form section for personal preferences -->
+        <section id="formas-preferences">
+            <h3>Forms</h3>
+            <form action="#" method="post">
+                <fieldset>
+                    <legend>Datos básicos</legend>
+                    <label for="fullName">Nombre completo</label>
+                    <input type="text" id="fullName" name="fullName" value="Luis Fer" disabled>
+
+                    <label for="age">Edad</label>
+                    <input type="number" id="age" name="age" value="34" disabled>
+                </fieldset>
+
+                <fieldset>
+                    <legend>Ciudad (elige una)</legend>
+                    <label for="medellin">
+                        <input type="radio" id="medellin" name="ciudad" value="Medellin" required>
+                        Medellín
+                    </label>
+                    <label for="bogota">
+                        <input type="radio" id="bogota" name="ciudad" value="Bogota">
+                        Bogotá
+                    </label>
+                    <label for="cali">
+                        <input type="radio" id="cali" name="ciudad" value="Cali">
+                        Cali
+                    </label>
+                </fieldset>
+
+                <fieldset>
+                    <legend>Hobbies (elige uno)</legend>
+                    <label for="hobby1">
+                        <input type="radio" id="hobby1" name="hobby" value="Musica" required>
+                        Música
+                    </label>
+                    <label for="hobby2">
+                        <input type="radio" id="hobby2" name="hobby" value="Deportes">
+                        Deportes
+                    </label>
+                    <label for="hobby3">
+                        <input type="radio" id="hobby3" name="hobby" value="Videojuegos">
+                        Videojuegos
+                    </label>
+                </fieldset>
+
+                <label for="genre">Género musical favorito</label>
+                <select id="genre" name="genre" required>
+                    <option value="">Selecciona una opción</option>
+                    <option value="rock">Rock</option>
+                    <option value="pop">Pop</option>
+                    <option value="electronica">Electrónica</option>
+                    <option value="urbano">Urbano</option>
+                    <option value="clasica">Clásica</option>
+                    <option value="otro">Otro</option>
+                </select>
+
+                <label for="availability">Nivel de interés en tecnología</label>
+                <input type="range" id="availability" name="availability" min="1" max="10" value="5" required>
+
+                <fieldset>
+                    <legend>Otros</legend>
+                    <label for="favcolor">Color favorito</label>
+                    <input type="color" id="favcolor" name="favcolor" value="#0000ff" required>
+
+                    <label for="bday">Fecha de cumpleaños</label>
+                    <input type="date" id="bday" name="bday" value="1990-01-01" required>
+
+                    <label for="comments">Comentarios personales</label>
+                    <textarea id="comments" name="comments" rows="4" minlength="10" maxlength="300" placeholder="Escribe tus comentarios aquí..." required></textarea>
+                </fieldset>
+
+                <button type="submit">Guardar</button>
+            </form>
+        </section>
+
+        <!-- Complementary information related to the main content -->
+        <aside>
+            <h3>Complementos</h3>
+            <section id="skills">
+                <h4>Habilidades</h4>
+                <ul>
+                    <li>HTML, CSS, JavaScript</li>
+                    <li>Git</li>
+                    <li>React (básico)</li>
+                </ul>
+            </section>
+            <section>
+                <h4>Tecnologías que me interesan</h4>
+                <ul>
+                    <li>Node.js</li>
+                    <li>TypeScript</li>
+                    <li>APIs REST</li>
+                </ul>
+            </section>
+            <section>
+                <h4>Redes</h4>
+                <ul>
+                    <li><a href="https://github.com/tuusuario">GitHub</a></li>
+                    <li><a href="https://www.linkedin.com/in/luisfoviedob/">LinkedIn</a></li>
+                </ul>
+            </section>
+        </aside>
+
+        <!-- Primary contact information -->
+        <section id="contact">
+            <h3>Contacto</h3>
+            <ul>
+                <li>Email: <a href="mailto:ingluisferoviedo@gmail.com">ingluisferoviedo@gmail.com</a></li>
+                <li>Teléfono: <a href="tel:+573145424511">+57 314 542 4511</a></li>
+                <li>LinkedIn: <a href="https://www.linkedin.com/in/luisfoviedob/">linkedin.com/in/luisfoviedob/</a></li>
+            </ul>
+        </section>
+
+        <!-- Highlighted projects -->
+        <section id="projects">
+          <h3>Proyectos</h3>
+            <article>
+                <h4>Proyectos Destacados</h4>
+                <ul>
+                    <li>Portfolio Personal - Un sitio web para mostrar mis proyectos y habilidades.</li>
+                    <li>Aplicación de Tareas - Una aplicación web para gestionar tareas diarias.</li>
+                </ul>
+            </article>
+        </section>
+
+    </main>
+    <!-- Footer with legal notice -->
+    <footer>
+    <p>&copy; 2026 Luis Oviedo Berrocal</p>
+</footer>
+</body>
+
+
+</html>

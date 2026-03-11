@@ -1,0 +1,224 @@
+
+/* Reset basico */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+/* Tipografia y fondo general */
+body {
+  font-family: -apple-system, "Segoe UI", Roboto, Geneva, Verdana, sans-serif;
+  font-size: 16px;
+  line-height: 1.6;
+  background-color: #eeeaaedc;
+  color: #333;
+}
+/*Justificacion de texto*/
+p, li {
+    text-align: justify;
+    hyphens: auto;
+}
+/* Contenedor principal */
+.container {
+    width: 90%;
+    margin: auto;
+    padding: 20px;
+    background-color: #ffffff9a;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+/* Encabezado y pie */
+header, footer {
+    background-color: #d98e3e;
+    color: white;
+    text-align: center;
+    padding: 10px 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Titulares */
+h1, h2, h3 {
+  line-height: 1.2;
+  margin: 0 0 20px 0;
+  color: #d98e3e;
+}
+  h1 {
+    font-size: 2.5rem;
+    }
+  h2 {
+    font-size: 2rem;
+    }
+  h3 {
+    font-size: 1.5rem;
+    }
+
+header h1,
+header h2,
+header h3,
+footer h1,
+footer h2,
+footer h3 {
+  color: white;
+}
+
+/* Layout principal */
+main {
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
+  padding: 30px 0;
+}
+
+/* Tarjetas de seccion */
+section {
+  padding: 20px;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.06);
+}
+
+/* Navegacion */
+nav ul {
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  justify-content: center;
+  padding: 10px 0 0 0;
+}
+
+nav a {
+  color: white;
+  text-decoration: none;
+  font-weight: 600;
+}
+
+nav a:hover {
+  text-decoration: underline;
+}
+
+/* Cabecera de hoja de vida */
+.cv-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 24px;
+  margin-bottom: 24px;
+}
+
+/* Titulo principal */
+.cv-title {
+  font-size: 1.1rem;
+  color: #5a4b37;
+  margin-top: -10px;
+}
+
+/* Tarjeta de contacto */
+.cv-contact {
+  background: #f7f1e7;
+  padding: 16px 18px;
+  border-radius: 10px;
+  min-width: 240px;
+}
+
+/* Etiqueta */
+.cv-label {
+  font-weight: 700;
+  text-transform: uppercase;
+  font-size: 0.85rem;
+  letter-spacing: 0.08em;
+  color: #8b5a2c;
+  margin-bottom: 6px;
+}
+
+/* Grilla principal de contenido */
+.cv-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 24px;
+  margin-bottom: 24px;
+}
+
+/* Listas */
+.tag-list,
+.simple-list {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 16px 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.simple-list {
+  flex-direction: column;
+  gap: 6px;
+}
+
+.tag-list li {
+  background: #f0dfc5;
+  padding: 6px 10px;
+  border-radius: 999px;
+  font-size: 0.9rem;
+}
+
+/* Metadatos y referencias */
+.job {
+  padding: 14px 0;
+  border-bottom: 1px solid #f0e2cf;
+}
+
+.job:last-child {
+  border-bottom: none;
+}
+
+.meta {
+  color: #6c5b47;
+  font-size: 0.95rem;
+  margin-bottom: 8px;
+}
+
+.ref {
+  padding: 10px 0;
+  border-bottom: 1px solid #f0e2cf;
+}
+
+.ref:last-child {
+  border-bottom: none;
+}
+
+.ref-name {
+  font-weight: 700;
+}
+
+/* Dos columnas (educacion / contacto) */
+.cv-two-col {
+  display: flex;
+  gap: 24px;
+  flex-wrap: wrap;
+  margin-bottom: 16px;
+}
+
+.cv-two-col > div {
+  flex: 1 1 240px;
+}
+
+/* Responsive */
+@media (max-width: 720px) {
+  body {
+    font-size: 15px;
+  }
+
+  section {
+    padding: 16px;
+  }
+
+  .cv-contact {
+    width: 100%;
+  }
+}

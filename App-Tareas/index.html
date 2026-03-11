@@ -1,0 +1,47 @@
+<!DOCTYPE HTML>
+<html lang="es">
+  <head>
+    <!-- Configuración básica del documento -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title> Gestor de Tareas</title>
+    <!-- Hoja de estilos principal -->
+    <link rel="stylesheet" href="./css/styles.css" />
+  </head>
+
+  <body>
+    <!-- Contenedor principal de la aplicación -->
+    <main class="app">
+      <!-- Título visible de la app -->
+      <h1>Gestor de Tareas</h1>
+
+      <!-- Donde el usuario escribe la tarea -->
+      <section class="controls">
+        <input
+          id="taskInput"
+          type="text"
+          placeholder="Escribe una tarea..."
+          autocomplete="off"
+        />
+        <!-- Botón para aregar tarea -->
+        <button id="addTaskBtn" type="button">Agregar</button>
+        </section>
+
+        <!-- Sección donde se renderiza la lista dinámica de tareas -->
+        <section class="list">
+          <ul id="tasklist" aria-label="Lista de tareas"></ul>
+        </section>
+        <!-- Spans que sirven para contar-->
+        <h2>Contador</h2>
+        <section class="stats">
+          <p>Total: <span id="totalCount">0</span></p>
+          <p>Completadas: <span id="doneCount">0</span></p>
+          <p>Pendientes: <span id="pendingCount">0</span></p>
+        </section>
+
+    </main>
+
+    <!-- Script con la lógica de interacción de la app -->
+    <script src="./js/app.js"></script>
+  </body>
+</html>
