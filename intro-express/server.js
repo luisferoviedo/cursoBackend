@@ -1,4 +1,5 @@
 const express = require('express')
+const { version } = require('react')
 
 const app = express()
 
@@ -8,17 +9,16 @@ const PORT = process.env.PORT || 3000
 app.get("/", (req, res) => {
   res.send('Bienvenidos a mi aplicacion web!')
 })
-
-app.get("/projects", (req,res) => {
-  res.send("Pagina de proyectos")
-
-})
-
-app.use((req, res) => {
-  res.status(404).send("Ruta no encontrada. Usa / o /projects")
-})
+app.get("/api", (req, res) => {
+  res.json({
+    name: "Project Management System - API",
+    version: "1.0.0",
+    status: "running"
+  })
+}
+)
 
 app.listen(PORT, () => {
-  console.log(`Servidor ejecutandose en http://localhost:${PORT}`)
+  console.log(`Servidor running http://localhost:${PORT}`)
 }
 )
