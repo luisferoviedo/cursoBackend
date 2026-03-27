@@ -1,96 +1,125 @@
-let projects = [
-    {
-        id: 1,
-        name: "Website design",
-        status: "active",
-        description: "Diseño de un sitio web responsivo"
-    },
-    {
-        id: 2,
-        name: "Mobile App",
-        status: "planning",
-        description: "Creación de una app de contactos con Flutter"
-    }
-]
+// Este controller es la capa intermedia entre routes y services.
+// Recibe req/res desde projects.routes.js.
+// Toma datos de params o body, llama a project.service.js
+// y finalmente arma la respuesta HTTP para el cliente.
 
-// Devuelve todo el arreglo en memoria.
-const getProjects = (req, res) => {
-    res.json(projects)
-}
+const projectService = require('../services/project.service')
 
-// Toma el id desde la URL, lo convierte a número y busca coincidencia.
-const getProjectById = (req, res) => {
-    const id = parseInt(req.params.id)
+// Convierte un parámetro de la URL a número y corta la request si no es válido.
+// Esta función ayuda a no repetir la misma validación en get/update/delete.
+const getValidProjectId = (req, res) => {
+  const id = parseInt(req.params.id, 10)
 
-    const project = projects.find(project => project.id === id)
-
-    if(!project) {
-
-        return res.status(404).json({ message: "Project not found" })
-    }
-
-    res.json(project)
-}
-
-// Crea un objeto nuevo usando los datos del body y lo agrega al arreglo.
-const createProject = (req, res) => {
-    const { name, status, description } = req.body
-
-    const newProject = {
-        // Como no hay base de datos, el id se simula con el tamaño actual del arreglo.
-        id: projects.length + 1,
-        name,
-        status,
-        description
-    }
-
-    projects.push(newProject)
-
-    res.status(201).json(newProject)
-}
-
-// Busca primero el proyecto y luego actualiza solo los campos que llegan en el body.
-const updateProject = (req, res) => {
-    const id = parseInt(req.params.id)
-    const project = projects.find(project => project.id === id)
-
-    if(!project) {
-        return res.status(404).json({ message: "Project not found" })
-    }
-
-    const { name, status, description } = req.body
-
-    // Si un campo no llega, se conserva el valor anterior.
-    project.name = name || project.name
-    project.status = status || project.status
-    project.description = description || project.description
-
-    res.json(project)
-}
-
-// Busca la posición exacta dentro del arreglo para poder eliminar con splice.
-const deleteProject = (req, res) => {
-    const id = parseInt(req.params.id)
-    const index = projects.findIndex(project => project.id === id)
-
-    if (index === -1) {
-        return res.status(404).json({ message: "Project not found" })
-    }
-
-    const deleted = projects.splice(index, 1)
-
-    // deleted es un arreglo; por eso devolvemos deleted[0].
-    res.json({
-        message: "Project deleted",
-        project: deleted[0]
+  if (Number.isNaN(id)) {
+    res.status(400).json({
+      message: 'Project id must be a valid number'
     })
+
+    return null
+  }
+
+  return id
 }
 
+// Unificamos el manejo de errores para no repetir bloques en cada handler.
+// Si el service mandó un status específico como 404, lo respetamos aquí.
+const handleControllerError = (error, res) => {
+  console.error(error)
+
+  res.status(error.status || 500).json({
+    message: error.message || 'Internal server error'
+  })
+}
+
+// Devuelve todos los proyectos guardados en la base.
+// Este controller no consulta SQLite directamente: le pide la información al service.
+const getProjects = async (req, res) => {
+  try {
+    const projects = await projectService.getProjects(req.app.locals.db)
+
+    res.json(projects)
+  } catch (error) {
+    handleControllerError(error, res)
+  }
+}
+
+// Devuelve un proyecto puntual por id.
+// Flujo interno: route -> controller -> service -> db -> service -> controller -> response
+const getProjectById = async (req, res) => {
+  const id = getValidProjectId(req, res)
+
+  if (id === null) {
+    return
+  }
+
+  try {
+    const project = await projectService.getProjectById(req.app.locals.db, id)
+
+    res.json(project)
+  } catch (error) {
+    handleControllerError(error, res)
+  }
+}
+
+// Inserta un proyecto nuevo usando la capa de servicio.
+// req.body llega desde Express y el controller se lo pasa casi intacto al service.
+const createProject = async (req, res) => {
+  try {
+    const project = await projectService.createProject(req.app.locals.db, req.body)
+
+    res.status(201).json(project)
+  } catch (error) {
+    handleControllerError(error, res)
+  }
+}
+
+// Actualiza un proyecto existente sin dejar reglas de negocio dentro del controller.
+// El controller solo coordina; la lógica de "qué se conserva" vive en el service.
+const updateProject = async (req, res) => {
+  const id = getValidProjectId(req, res)
+
+  if (id === null) {
+    return
+  }
+
+  try {
+    const project = await projectService.updateProject(
+      req.app.locals.db,
+      id,
+      req.body
+    )
+
+    res.json(project)
+  } catch (error) {
+    handleControllerError(error, res)
+  }
+}
+
+// Elimina un proyecto y devuelve el registro previo para facilitar QA.
+// Esto ayuda a confirmar exactamente qué registro salió de la base.
+const deleteProject = async (req, res) => {
+  const id = getValidProjectId(req, res)
+
+  if (id === null) {
+    return
+  }
+
+  try {
+    const project = await projectService.deleteProject(req.app.locals.db, id)
+
+    res.json({
+      message: 'Project deleted',
+      project
+    })
+  } catch (error) {
+    handleControllerError(error, res)
+  }
+}
 
 module.exports = {
-    getProjects,
-    getProjectById,
-    createProject,
-    updateProject,
-    deleteProject
+  getProjects,
+  getProjectById,
+  createProject,
+  updateProject,
+  deleteProject
 }

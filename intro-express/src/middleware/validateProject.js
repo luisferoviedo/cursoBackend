@@ -1,6 +1,8 @@
 // Este middleware se ejecuta antes de createProject.
+// El router le manda aquí la request antes de pasarla al controller.
 // Su trabajo es cortar la request si falta información obligatoria.
 const validateProject = (req, res, next) => {
+  // En esta versión solo exigimos el nombre como dato mínimo.
   const { name } = req.body
 
   if (!name) {
@@ -11,4 +13,5 @@ const validateProject = (req, res, next) => {
   next()
 }
 
+// Exportamos la validación para usarla en el router de projects.
 module.exports = validateProject
