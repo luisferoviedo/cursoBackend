@@ -6,7 +6,9 @@
   "scripts": {
     "start": "node src/server.js",
     "dev": "nodemon src/server.js",
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "recreate:tasks": "node scripts/recreateTasksTable.js",
+    "seed:professor": "node scripts/seedProfessorDemo.js",
+    "test": "node --check server.js && find src scripts -name '*.js' -print0 | xargs -0 -n1 node --check",
     "nodemon": "nodemon src/server.js"
   },
   "keywords": [],
@@ -19,7 +21,9 @@
     "express": "^5.2.1",
     "jsonwebtoken": "^9.0.3",
     "sqlite": "^5.1.1",
-    "sqlite3": "^6.0.1"
+    "sqlite3": "^6.0.1",
+    "swagger-jsdoc": "^6.2.8",
+    "swagger-ui-express": "^5.0.1"
   },
   "devDependencies": {
     "nodemon": "^3.1.14"

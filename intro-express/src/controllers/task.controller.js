@@ -6,32 +6,10 @@
 // 4) transformar el resultado en respuesta HTTP
 
 const taskService = require('../services/task.service')
-
-// Convierte un parámetro de la URL a número y corta la request si no es válido.
-// Se usa tanto para projectId como para id de la tarea.
-const getValidNumericParam = (value, message, res) => {
-  const parsedValue = parseInt(value, 10)
-
-  if (Number.isNaN(parsedValue)) {
-    res.status(400).json({
-      message
-    })
-
-    return null
-  }
-
-  return parsedValue
-}
-
-// Todos los controllers comparten el mismo criterio para responder errores.
-// Si el service lanzó un status conocido lo respetamos; si no, respondemos 500.
-const handleControllerError = (error, res) => {
-  console.error(error)
-
-  res.status(error.status || 500).json({
-    message: error.message || 'Internal server error'
-  })
-}
+const {
+  handleControllerError,
+  getValidNumericParam
+} = require('../utils/controller.helpers')
 
 // Lista las tareas de un proyecto específico.
 // Este archivo le manda projectId y db al service para que el service haga la consulta.
@@ -50,6 +28,26 @@ const getTasksByProject = async (req, res) => {
     const tasks = await taskService.getTasksByProject(
       req.app.locals.db,
       projectId
+    )
+
+    res.json(tasks)
+  } catch (error) {
+    handleControllerError(error, res)
+  }
+}
+
+// Lista tareas globalmente para pruebas.
+// Permite filtrar por status y priority usando query params.
+// También acepta sort=asc|desc y limita la respuesta a 10 registros.
+const listTasks = async (req, res) => {
+  try {
+    const tasks = await taskService.listTasks(
+      req.app.locals.db,
+      {
+        status: req.query.status,
+        priority: req.query.priority,
+        sort: req.query.sort
+      }
     )
 
     res.json(tasks)
@@ -182,6 +180,7 @@ const deleteTask = async (req, res) => {
 }
 
 module.exports = {
+  listTasks,
   getTasksByProject,
   createTask,
   getTaskById,

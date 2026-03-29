@@ -11,6 +11,9 @@ const bcrypt = require('bcrypt')
 // JWT se usa para firmar y verificar tokens de acceso.
 const jwt = require('jsonwebtoken')
 
+const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+const MIN_PASSWORD_LENGTH = 6
+
 // Crea errores con status HTTP para que el controller pueda responder
 // sin mezclar lógica de negocio con la capa HTTP.
 const createAuthError = (status, message) => {
@@ -41,6 +44,14 @@ const registerUser = async (db, userData) => {
 
   if (!name || !email || !password) {
     throw createAuthError(400, 'Name, email and password are required')
+  }
+
+  if (!EMAIL_REGEX.test(email)) {
+    throw createAuthError(400, 'Email format is invalid')
+  }
+
+  if (password.length < MIN_PASSWORD_LENGTH) {
+    throw createAuthError(400, `Password must have at least ${MIN_PASSWORD_LENGTH} characters`)
   }
 
   const existingUser = await db.get(
@@ -90,6 +101,10 @@ const loginUser = async (db, credentials) => {
 
   if (!email || !password) {
     throw createAuthError(400, 'Email and password are required')
+  }
+
+  if (!EMAIL_REGEX.test(email)) {
+    throw createAuthError(400, 'Email format is invalid')
   }
 
   const user = await db.get(

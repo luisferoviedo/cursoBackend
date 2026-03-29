@@ -238,7 +238,7 @@ Body JSON:
 {
   "name": "Graphic Design",
   "description": "Landing page y branding",
-  "status": "planning"
+  "status": "pending"
 }
 ```
 
@@ -251,7 +251,7 @@ Body JSON:
 ```json
 {
   "name": "Graphic Design",
-  "status": "in progress"
+  "status": "in_progress"
 }
 ```
 
@@ -278,7 +278,7 @@ Body JSON:
 ```json
 {
   "title": "Definir estructura visual",
-  "status": "todo"
+  "status": "pending"
 }
 ```
 
@@ -290,7 +290,7 @@ Actualiza una tarea.
 
 Elimina una tarea.
 
-Requiere rol `admin`.
+Requiere rol `user` o `admin`.
 
 ## Estructura del proyecto
 
@@ -369,7 +369,7 @@ Checklist reproducible:
 ## Ideas de prueba
 
 - Prueba unitaria:
-  validar que `loginUser` lance `401` cuando la contraseña no coincide.
+  validar que `getValidNumericParam` rechace ids malformados como `1abc`.
 - Prueba de integración:
   registrar usuario, hacer login y consumir `/api/projects` con el token recibido.
 - QA manual:

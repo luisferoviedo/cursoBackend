@@ -15,10 +15,14 @@ const validateProjectUpdate = (req, res, next) => {
     })
   }
 
-  if (name !== undefined && !name) {
+  if (name !== undefined && (typeof name !== 'string' || !name.trim())) {
     return res.status(400).json({
       message: 'Project name cannot be empty'
     })
+  }
+
+  if (typeof name === 'string') {
+    req.body.name = name.trim()
   }
 
   next()

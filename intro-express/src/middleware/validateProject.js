@@ -5,9 +5,11 @@ const validateProject = (req, res, next) => {
   // En esta versión solo exigimos el nombre como dato mínimo.
   const { name } = req.body
 
-  if (!name) {
+  if (typeof name !== 'string' || !name.trim()) {
     return res.status(400).json({ message: 'Project name is required' })
   }
+
+  req.body.name = name.trim()
 
   // Si todo está bien, la request sigue hacia el controller.
   next()

@@ -4,38 +4,22 @@
 // y finalmente arma la respuesta HTTP para el cliente.
 
 const projectService = require('../services/project.service')
-
-// Convierte un parámetro de la URL a número y corta la request si no es válido.
-// Esta función ayuda a no repetir la misma validación en get/update/delete.
-const getValidProjectId = (req, res) => {
-  const id = parseInt(req.params.id, 10)
-
-  if (Number.isNaN(id)) {
-    res.status(400).json({
-      message: 'Project id must be a valid number'
-    })
-
-    return null
-  }
-
-  return id
-}
-
-// Unificamos el manejo de errores para no repetir bloques en cada handler.
-// Si el service mandó un status específico como 404, lo respetamos aquí.
-const handleControllerError = (error, res) => {
-  console.error(error)
-
-  res.status(error.status || 500).json({
-    message: error.message || 'Internal server error'
-  })
-}
+const {
+  handleControllerError,
+  getValidNumericParam
+} = require('../utils/controller.helpers')
 
 // Devuelve todos los proyectos guardados en la base.
 // Este controller no consulta SQLite directamente: le pide la información al service.
 const getProjects = async (req, res) => {
   try {
-    const projects = await projectService.getProjects(req.app.locals.db)
+    const projects = await projectService.getProjects(
+      req.app.locals.db,
+      {
+        status: req.query.status,
+        sort: req.query.sort
+      }
+    )
 
     res.json(projects)
   } catch (error) {
@@ -46,7 +30,11 @@ const getProjects = async (req, res) => {
 // Devuelve un proyecto puntual por id.
 // Flujo interno: route -> controller -> service -> db -> service -> controller -> response
 const getProjectById = async (req, res) => {
-  const id = getValidProjectId(req, res)
+  const id = getValidNumericParam(
+    req.params.id,
+    'Project id must be a valid number',
+    res
+  )
 
   if (id === null) {
     return
@@ -76,7 +64,11 @@ const createProject = async (req, res) => {
 // Actualiza un proyecto existente sin dejar reglas de negocio dentro del controller.
 // El controller solo coordina; la lógica de "qué se conserva" vive en el service.
 const updateProject = async (req, res) => {
-  const id = getValidProjectId(req, res)
+  const id = getValidNumericParam(
+    req.params.id,
+    'Project id must be a valid number',
+    res
+  )
 
   if (id === null) {
     return
@@ -98,7 +90,11 @@ const updateProject = async (req, res) => {
 // Elimina un proyecto y devuelve el registro previo para facilitar QA.
 // Esto ayuda a confirmar exactamente qué registro salió de la base.
 const deleteProject = async (req, res) => {
-  const id = getValidProjectId(req, res)
+  const id = getValidNumericParam(
+    req.params.id,
+    'Project id must be a valid number',
+    res
+  )
 
   if (id === null) {
     return

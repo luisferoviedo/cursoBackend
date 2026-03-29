@@ -1,11 +1,11 @@
 // Revisa que el status enviado esté dentro de los estados permitidos.
 // Se usa cuando el status es obligatorio, por ejemplo en creates.
+const { isSupportedStatus } = require('../constants/status.constants')
+
 const validateStatus = (req, res, next) => {
   const { status } = req.body
-  // Esta lista funciona como contrato simple del API.
-  const validStatus = [ 'To do', 'In progress', 'Done']
 
-  if (!validStatus.includes(status)) {
+  if (!isSupportedStatus(status)) {
     return res.status(400).json({message: `Invalid status value`})
   }
 

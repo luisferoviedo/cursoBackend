@@ -1,6 +1,12 @@
 // Esta capa contiene la lógica de negocio del módulo de proyectos.
 // No conoce Express ni responde res.json().
 // Recibe la conexión db desde el controller y trabaja directamente con SQLite.
+const {
+  PROJECT_STATUSES,
+  PROJECT_SORT_DIRECTIONS,
+  PROJECT_LIST_LIMIT
+} = require('../constants/project.constants')
+const { normalizeStatus } = require('../constants/status.constants')
 
 // Crea errores de servicio con status HTTP para desacoplar el controller
 // de la lógica de negocio y de los mensajes repetidos.
@@ -28,10 +34,36 @@ const getProjectOrThrow = async (db, projectId) => {
 
 // Lista todos los proyectos ordenados por id para mantener respuestas estables.
 // El controller llama esta función cuando llega GET /api/projects.
-const getProjects = async (db) => {
-  return db.all(
-    'SELECT * FROM projects ORDER BY id'
-  )
+const getProjects = async (db, filters = {}) => {
+  const { status, sort } = filters
+  let query = 'SELECT * FROM projects WHERE 1 = 1'
+  const params = []
+  let sortDirection = 'ASC'
+
+  if (status !== undefined) {
+    const normalizedStatus = normalizeStatus(status)
+
+    if (!PROJECT_STATUSES.includes(normalizedStatus)) {
+      throw createServiceError(400, 'Invalid project status value')
+    }
+
+    query += ' AND status = ?'
+    params.push(normalizedStatus)
+  }
+
+  if (sort !== undefined) {
+    const normalizedSort = String(sort).toLowerCase()
+
+    if (!PROJECT_SORT_DIRECTIONS.includes(normalizedSort)) {
+      throw createServiceError(400, 'Invalid sort value. Use asc or desc')
+    }
+
+    sortDirection = normalizedSort.toUpperCase()
+  }
+
+  query += ` ORDER BY id ${sortDirection} LIMIT ${PROJECT_LIST_LIMIT}`
+
+  return db.all(query, params)
 }
 
 // Devuelve un proyecto puntual.
@@ -43,7 +75,8 @@ const getProjectById = async (db, projectId) => {
 // Inserta un proyecto nuevo y devuelve el registro creado.
 // La información creada vuelve al controller, y el controller la envía al cliente.
 const createProject = async (db, projectData) => {
-  const { name, description, status } = projectData
+  const { name, description, status: rawStatus } = projectData
+  const status = normalizeStatus(rawStatus)
 
   const result = await db.run(
     'INSERT INTO projects (name, description, status) VALUES (?, ?, ?)',
@@ -66,7 +99,9 @@ const updateProject = async (db, projectId, projectData) => {
   const updatedProject = {
     name: projectData.name ?? currentProject.name,
     description: projectData.description ?? currentProject.description,
-    status: projectData.status ?? currentProject.status
+    status: projectData.status === undefined
+      ? currentProject.status
+      : normalizeStatus(projectData.status)
   }
 
   await db.run(

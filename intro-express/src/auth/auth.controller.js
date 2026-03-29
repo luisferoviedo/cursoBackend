@@ -1,15 +1,7 @@
 // Este controller conecta la capa HTTP con auth.service.js.
 // Recibe req/res desde auth.routes.js y delega la lógica real al service.
 const authService = require('./auth.service')
-
-// Mantiene un criterio uniforme para responder errores del módulo auth.
-const handleAuthError = (error, res) => {
-  console.error(error)
-
-  res.status(error.status || 500).json({
-    message: error.message || 'Internal server error'
-  })
-}
+const { handleControllerError } = require('../utils/controller.helpers')
 
 // Crea un usuario nuevo a partir del body enviado por el cliente.
 // El controller no hashea contraseñas ni consulta SQLite directo.
@@ -19,7 +11,7 @@ const register = async (req, res) => {
 
     res.status(201).json(user)
   } catch (error) {
-    handleAuthError(error, res)
+    handleControllerError(error, res)
   }
 }
 
@@ -30,7 +22,7 @@ const getCurrentUser = async (req, res) => {
 
     res.json(user)
   } catch (error) {
-    handleAuthError(error, res)
+    handleControllerError(error, res)
   }
 }
 
@@ -42,7 +34,7 @@ const login = async (req, res) => {
 
     res.json(authResult)
   } catch (error) {
-    handleAuthError(error, res)
+    handleControllerError(error, res)
   }
 }
 

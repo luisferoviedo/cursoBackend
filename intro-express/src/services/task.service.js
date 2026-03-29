@@ -4,6 +4,14 @@
 // 2) hacer queries SQL
 // 3) devolver datos listos al controller
 
+const {
+  TASK_STATUSES,
+  TASK_PRIORITIES,
+  TASK_SORT_DIRECTIONS,
+  TASK_LIST_LIMIT
+} = require('../constants/task.constants')
+const { normalizeStatus } = require('../constants/status.constants')
+
 // Crea errores con status HTTP para que el controller pueda responder
 // sin meter reglas de negocio ni mensajes duplicados.
 const createServiceError = (status, message) => {
@@ -26,6 +34,22 @@ const getProjectOrThrow = async (db, projectId) => {
   }
 
   return project
+}
+
+// Si la tarea se asigna a un usuario, confirmamos que exista antes de guardar la relación.
+const ensureUserExists = async (db, userId) => {
+  if (userId === undefined || userId === null) {
+    return
+  }
+
+  const user = await db.get(
+    'SELECT id FROM users WHERE id = ?',
+    [userId]
+  )
+
+  if (!user) {
+    throw createServiceError(400, 'Assigned user does not exist')
+  }
 }
 
 // Busca una tarea dentro del proyecto indicado.
@@ -54,6 +78,49 @@ const getTasksByProject = async (db, projectId) => {
   )
 }
 
+// Lista tareas globalmente para pruebas, con filtros opcionales seguros.
+// Se construye SQL dinámico usando placeholders para evitar SQL injection.
+const listTasks = async (db, filters = {}) => {
+  const { status, priority, sort } = filters
+  let query = 'SELECT * FROM tasks WHERE 1 = 1'
+  const params = []
+  let sortDirection = 'ASC'
+
+  if (status !== undefined) {
+    const normalizedStatus = normalizeStatus(status)
+
+    if (!TASK_STATUSES.includes(normalizedStatus)) {
+      throw createServiceError(400, 'Invalid task status value')
+    }
+
+    query += ' AND status = ?'
+    params.push(normalizedStatus)
+  }
+
+  if (priority !== undefined) {
+    if (!TASK_PRIORITIES.includes(priority)) {
+      throw createServiceError(400, 'Invalid task priority value')
+    }
+
+    query += ' AND priority = ?'
+    params.push(priority)
+  }
+
+  if (sort !== undefined) {
+    const normalizedSort = String(sort).toLowerCase()
+
+    if (!TASK_SORT_DIRECTIONS.includes(normalizedSort)) {
+      throw createServiceError(400, 'Invalid sort value. Use asc or desc')
+    }
+
+    sortDirection = normalizedSort.toUpperCase()
+  }
+
+  query += ` ORDER BY id ${sortDirection} LIMIT ${TASK_LIST_LIMIT}`
+
+  return db.all(query, params)
+}
+
 // Devuelve una tarea puntual dentro del proyecto.
 const getTaskById = async (db, projectId, taskId) => {
   await getProjectOrThrow(db, projectId)
@@ -66,19 +133,53 @@ const getTaskById = async (db, projectId, taskId) => {
 const createTask = async (db, projectId, taskData) => {
   await getProjectOrThrow(db, projectId)
 
-  const { title, status } = taskData
+  const {
+    title,
+    description,
+    status: rawStatus = 'pending',
+    priority = 'medium',
+    user_id = null,
+    due_date = null
+  } = taskData
+  const status = normalizeStatus(rawStatus)
+
+  await ensureUserExists(db, user_id)
+
+  if (!TASK_STATUSES.includes(status)) {
+    throw createServiceError(400, 'Invalid task status value')
+  }
+
+  if (!TASK_PRIORITIES.includes(priority)) {
+    throw createServiceError(400, 'Invalid task priority value')
+  }
 
   const result = await db.run(
-    'INSERT INTO tasks (title, status, project_id) VALUES (?, ?, ?)',
-    [title, status, projectId]
+    `
+      INSERT INTO tasks (
+        title,
+        description,
+        status,
+        priority,
+        project_id,
+        user_id,
+        due_date
+      ) VALUES (?, ?, ?, ?, ?, ?, ?)
+    `,
+    [
+      title,
+      description ?? null,
+      status,
+      priority,
+      projectId,
+      user_id,
+      due_date ?? null
+    ]
   )
 
-  return {
-    id: result.lastID,
-    title,
-    status,
-    project_id: projectId
-  }
+  return db.get(
+    'SELECT * FROM tasks WHERE id = ? AND project_id = ?',
+    [result.lastID, projectId]
+  )
 }
 
 // Actualiza solo los campos que llegan; lo demás se conserva.
@@ -90,22 +191,53 @@ const updateTask = async (db, projectId, taskId, taskData) => {
 
   const updatedTask = {
     title: taskData.title ?? currentTask.title,
-    status: taskData.status ?? currentTask.status
+    description: taskData.description ?? currentTask.description,
+    status: taskData.status === undefined
+      ? currentTask.status
+      : normalizeStatus(taskData.status),
+    priority: taskData.priority ?? currentTask.priority ?? 'medium',
+    user_id: taskData.user_id === undefined ? currentTask.user_id : taskData.user_id,
+    due_date: taskData.due_date === undefined ? currentTask.due_date : taskData.due_date
+  }
+
+  await ensureUserExists(db, updatedTask.user_id)
+
+  if (!TASK_STATUSES.includes(updatedTask.status)) {
+    throw createServiceError(400, 'Invalid task status value')
+  }
+
+  if (!TASK_PRIORITIES.includes(updatedTask.priority)) {
+    throw createServiceError(400, 'Invalid task priority value')
   }
 
   await db.run(
     `
       UPDATE tasks
-      SET title = ?, status = ?
+      SET title = ?,
+          description = ?,
+          status = ?,
+          priority = ?,
+          user_id = ?,
+          due_date = ?,
+          updated_at = CURRENT_TIMESTAMP
       WHERE id = ? AND project_id = ?
     `,
-    [updatedTask.title, updatedTask.status, taskId, projectId]
+    [
+      updatedTask.title,
+      updatedTask.description,
+      updatedTask.status,
+      updatedTask.priority,
+      updatedTask.user_id,
+      updatedTask.due_date,
+      taskId,
+      projectId
+    ]
   )
 
-  return {
-    ...currentTask,
-    ...updatedTask
-  }
+  return db.get(
+    'SELECT * FROM tasks WHERE id = ? AND project_id = ?',
+    [taskId, projectId]
+  )
 }
 
 // Elimina una tarea y devuelve el registro borrado para confirmar el resultado.
@@ -123,6 +255,7 @@ const deleteTask = async (db, projectId, taskId) => {
 }
 
 module.exports = {
+  listTasks,
   getTasksByProject,
   getTaskById,
   createTask,
