@@ -6,6 +6,10 @@
   "scripts": {
     "start": "node src/server.js",
     "dev": "nodemon src/server.js",
+    "dev:api": "nodemon src/server.js",
+    "dev:front": "vite",
+    "build:front": "vite build",
+    "preview:front": "vite preview",
     "recreate:tasks": "node scripts/recreateTasksTable.js",
     "seed:professor": "node scripts/seedProfessorDemo.js",
     "test": "node --check server.js && find src scripts -name '*.js' -print0 | xargs -0 -n1 node --check",
@@ -16,16 +20,22 @@
   "license": "ISC",
   "type": "commonjs",
   "dependencies": {
+    "axios": "1.14.0",
     "bcrypt": "^6.0.0",
+    "bootstrap": "^5.3.8",
     "dotenv": "^17.3.1",
     "express": "^5.2.1",
     "jsonwebtoken": "^9.0.3",
+    "react": "^19.2.4",
+    "react-dom": "^19.2.4",
     "sqlite": "^5.1.1",
     "sqlite3": "^6.0.1",
     "swagger-jsdoc": "^6.2.8",
     "swagger-ui-express": "^5.0.1"
   },
   "devDependencies": {
-    "nodemon": "^3.1.14"
+    "@vitejs/plugin-react": "^6.0.1",
+    "nodemon": "^3.1.14",
+    "vite": "^8.0.3"
   }
 }
