@@ -1,10 +1,15 @@
 import { useEffect, useState } from 'react'
-import Login from './pages/login'
-import { api, getApiErrorMessage, setAuthToken } from './lib/api'
+import {
+  api,
+  AUTH_STORAGE_KEY,
+  getApiErrorMessage,
+  setAuthToken,
+  setUnauthorizedHandler
+} from './lib/api'
+import AppRouter from './routes/appRouter'
 
-// Aqui se guarda el JWT para reutilizar la sesion si el usuario recarga la pagina.
-const AUTH_STORAGE_KEY = 'auth_token'
-
+// Componente orquestador del frontend autenticado.
+// Aquí vive el estado fuente de sesión y de proyectos; las páginas reciben datos y callbacks por props.
 function App() {
   const [authStatus, setAuthStatus] = useState('checking')
   const [user, setUser] = useState(null)
@@ -14,7 +19,7 @@ function App() {
   const [isLoadingProjects, setIsLoadingProjects] = useState(false)
 
   useEffect(() => {
-    // Al abrir la app, primero miramos si ya habia un token guardado.
+    // Al recargar la SPA, intentamos restaurar la sesión antes de decidir si el usuario es guest.
     const storedToken = localStorage.getItem(AUTH_STORAGE_KEY)
 
     if (!storedToken) {
@@ -25,37 +30,57 @@ function App() {
     loadCurrentUser(storedToken)
   }, [])
 
+  useEffect(() => {
+    // Conectamos React con el interceptor global del cliente HTTP.
+    // Si el backend invalida la sesión, App vuelve a estado guest de forma centralizada.
+    setUnauthorizedHandler(() => {
+      clearClientSession('Tu sesion expiro. Inicia sesion de nuevo')
+    })
+
+    return () => {
+      setUnauthorizedHandler(null)
+    }
+  }, [])
+
+  function clearClientSession(sessionMessage = '') {
+    // Esta función concentra toda la limpieza de sesión para no duplicar reseteos.
+    setAuthToken(null)
+    localStorage.removeItem(AUTH_STORAGE_KEY)
+    setUser(null)
+    setProjects([])
+    setProjectsError('')
+    setSessionError(sessionMessage)
+    setAuthStatus('guest')
+  }
+
   async function loadCurrentUser(token) {
     try {
       setSessionError('')
       setAuthToken(token)
 
-      // Si el token sigue siendo valido, el backend responde con el usuario actual.
+      // La sesión solo se considera válida si el backend resuelve /auth/me correctamente.
       const { data } = await api.get('/auth/me')
 
       setUser(data)
       setAuthStatus('authenticated')
       await loadProjects()
     } catch (error) {
-      setAuthToken(null)
-      localStorage.removeItem(AUTH_STORAGE_KEY)
-      setUser(null)
-      setAuthStatus('guest')
-      setSessionError(getApiErrorMessage(error, 'No se pudo validar la sesion actual'))
+      clearClientSession(getApiErrorMessage(error, 'No se pudo validar la sesion actual'))
     }
   }
 
-  function handleLoginSuccess(authResult) {
-    // Login.jsx entrega { token, user } cuando /api/auth/login responde correctamente.
+  async function handleLoginSuccess(authResult) {
+    // Login entrega token + usuario. Desde aquí dejamos lista la sesión y cargamos recursos protegidos.
     localStorage.setItem(AUTH_STORAGE_KEY, authResult.token)
     setAuthToken(authResult.token)
     setUser(authResult.user)
     setSessionError('')
     setAuthStatus('authenticated')
-    loadProjects()
+    await loadProjects()
   }
 
-  // Aca es como se carga informacion protegida por autenticacion.
+  // Projects es estado compartido de la app autenticada.
+  // Mantener la carga aquí evita que cada página tenga que reimplementar el mismo fetch.
   async function loadProjects() {
     try {
       setIsLoadingProjects(true)
@@ -71,104 +96,30 @@ function App() {
       setIsLoadingProjects(false)
     }
   }
+  // Dashboard maneja la UX del formulario, pero App ejecuta la persistencia real y refresca la lista.
+  async function handleCreateProject(projectData) {
+    const { data } = await api.post('/projects', projectData)
+    await loadProjects()
+    return data
+  }
 
   function handleLogout() {
-    // Cerrar sesion aqui significa borrar el token y volver al formulario.
-    setAuthToken(null)
-    localStorage.removeItem(AUTH_STORAGE_KEY)
-    setUser(null)
-    setSessionError('')
-    setAuthStatus('guest')
+    // Al cerrar sesion limpiamos token y estado local para volver al acceso inicial.
+    clearClientSession()
   }
 
   return (
-    <main className="app-shell">
-      <section className={`auth-wrapper ${user ? 'auth-wrapper-wide' : ''}`}>
-        <div className="app-intro">
-          <p className="eyebrow">Practica de login</p>
-          <h1 className="hero-title">Inicio de sesion</h1>
-          <p className="hero-copy">
-            Interfaz simple conectada al backend Express para autenticar usuarios
-            con <code>/api/auth/login</code>.
-          </p>
-        </div>
-
-        {authStatus === 'checking' ? (
-          <div className="glass-card text-center">
-            <div className="spinner-border text-primary" role="status" />
-            <p className="mt-3 mb-0">Validando sesion guardada...</p>
-          </div>
-        ) : user ? (
-          // Si ya hay usuario, mostramos la vista autenticada en vez del login.
-          <div className="glass-card">
-            <p className="eyebrow mb-2">Sesion iniciada</p>
-            <h2 className="panel-title">Bienvenido, {user.name}</h2>
-            <p className="panel-copy">
-              El login fue exitoso. El token se guardo y el frontend valido al
-              usuario consultando <code>/api/auth/me</code>.
-            </p>
-
-            <dl className="user-data">
-              <div>
-                <dt>Email</dt>
-                <dd>{user.email}</dd>
-              </div>
-              <div>
-                <dt>Rol</dt>
-                <dd>{user.role}</dd>
-              </div>
-              <div>
-                <dt>ID</dt>
-                <dd>{user.id}</dd>
-              </div>
-            </dl>
-
-            <section className="project-panel">
-              <div className="project-panel-header">
-                <h3 className="h5 mb-0">Proyectos</h3>
-                <span className="project-count">{projects.length}</span>
-              </div>
-
-              {isLoadingProjects && <p className="project-feedback">Cargando proyectos...</p>}
-
-              {projectsError && (
-                <p className="text-danger mb-2">{projectsError}</p>
-              )}
-
-              {!isLoadingProjects && !projectsError && projects.length === 0 && (
-                <p className="project-feedback">No hay proyectos para mostrar.</p>
-              )}
-
-              {!isLoadingProjects && projects.length > 0 && (
-                <ul className="project-list">
-                  {projects.map((project) => (
-                    <li key={project.id} className="project-item">
-                      <div className="project-item-header">
-                        <strong>{project.name}</strong>
-                        <span className={`project-status project-status-${project.status}`}>
-                          {project.status}
-                        </span>
-                      </div>
-                      <p className="project-meta">
-                        Proyecto #{project.id}
-                        {project.description ? ` - ${project.description}` : ''}
-                      </p>
-                    </li>
-                  ))}
-                </ul>
-              )}
-            </section>
-
-            <button type="button" className="btn btn-outline-secondary w-100" onClick={handleLogout}>
-              Cerrar sesion
-            </button>
-          </div>
-        ) : (
-          // Si no hay sesion valida, App delega al componente Login la captura del formulario.
-          <Login onLoginSuccess={handleLoginSuccess} sessionError={sessionError} />
-        )}
-      </section>
-    </main>
+    <AppRouter
+      authStatus={authStatus}
+      user={user}
+      projects={projects}
+      sessionError={sessionError}
+      projectsError={projectsError}
+      isLoadingProjects={isLoadingProjects}
+      onLoginSuccess={handleLoginSuccess}
+      onLogout={handleLogout}
+      onCreateProject={handleCreateProject}
+    />
   )
 }
 

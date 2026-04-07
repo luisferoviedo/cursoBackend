@@ -1,11 +1,6 @@
-// Flujo general de la app:
-// 1) server.js recibe la request
-// 2) la manda al router correcto
-// 3) el router puede pasar por middlewares
-// 4) luego llega al controller
-// 5) el controller delega al service
-// 6) el service usa la conexión SQLite creada en database/db.js
-// 7) la respuesta vuelve al cliente en formato JSON
+// Punto de entrada real del backend.
+// Este archivo arma la aplicación Express, monta rutas y comparte la conexión SQLite.
+// No contiene reglas de negocio de auth, projects o tasks: solo orquestación HTTP.
 
 require('dotenv').config()
 // Express será el servidor HTTP principal de la aplicación.
@@ -38,6 +33,7 @@ app.use(express.json())
 app.use(logger)
 
 // Registra rutas públicas que no requieren token.
+// Aquí viven auth y endpoints informativos que el cliente puede consumir sin sesión.
 function registerPublicRoutes() {
   // Las rutas de auth quedan públicas porque todavía no hay token al registrarse o hacer login.
   app.use('/api/auth', authRoutes)
@@ -107,6 +103,7 @@ function registerPublicRoutes() {
 }
 
 // Registra rutas protegidas por JWT.
+// verifyAuth autentica primero; luego cada router decide permisos finos con authorize(...roles).
 function registerProtectedRoutes() {
   // Aquí conectamos el módulo de rutas de proyectos bajo el prefijo /api/projects.
   // Ejemplo:
@@ -122,7 +119,7 @@ function registerProtectedRoutes() {
   app.use('/api/projects/:projectId/tasks', verifyAuth, taskRoutes)
 }
 
-// Registra el 404 final cuando ninguna ruta respondió antes.
+// Este handler debe ir al final para capturar solo requests no resueltas por rutas anteriores.
 function registerNotFoundHandler() {
   app.use((req, res) => {
     res.status(404).json({
@@ -131,7 +128,8 @@ function registerNotFoundHandler() {
   })
 }
 
-// Registra el middleware global de errores.
+// Middleware global de errores no controlados.
+// Si algo no fue manejado por controllers/services, aquí devolvemos una respuesta consistente.
 function registerGlobalErrorHandler() {
   app.use((err, req, res, next) => {
     // Caso común: el cliente envía un JSON mal escrito.
@@ -154,10 +152,8 @@ registerProtectedRoutes()
 registerNotFoundHandler()
 registerGlobalErrorHandler()
 
-// Centralizamos el arranque para asegurar que la base esté lista
-// antes de aceptar tráfico HTTP.
-// Este archivo le pide a database/db.js que abra la conexión
-// y luego comparte esa conexión con controllers/services usando app.locals.db.
+// El servidor solo empieza a escuchar cuando la base ya está lista.
+// app.locals.db actúa como punto compartido de acceso para controllers y services.
 async function startServer() {
   try {
     // initDB conecta SQLite y crea tablas si todavía no existen.

@@ -1,8 +1,13 @@
 import { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { api, getApiErrorMessage } from '../lib/api'
 
+// Pantalla pública de acceso.
+// Controla solo la UX del formulario; la persistencia de sesión vive en App.
 function Login({ onLoginSuccess, sessionError }) {
-  // Este estado concentra lo que el usuario escribe en el formulario.
+  const navigate = useNavigate()
+
+  // Formulario controlado: el estado local refleja exactamente lo que el usuario ve en pantalla.
   const [formData, setFormData] = useState({
     email: '',
     password: ''
@@ -13,7 +18,7 @@ function Login({ onLoginSuccess, sessionError }) {
   function handleChange(event) {
     const { name, value } = event.target
 
-    // Con una sola funcion actualizamos email o password segun el input que cambio.
+    // Un único handler mantiene consistencia y reduce repetición entre email y password.
     setFormData((currentData) => ({
       ...currentData,
       [name]: value
@@ -21,7 +26,7 @@ function Login({ onLoginSuccess, sessionError }) {
   }
 
   async function handleSubmit(event) {
-    // Evita que el navegador recargue la pagina al enviar el formulario.
+    // Resolvemos el submit por JS para manejar loading, errores y navegación sin recargar la SPA.
     event.preventDefault()
 
     if (!formData.email.trim() || !formData.password.trim()) {
@@ -33,14 +38,15 @@ function Login({ onLoginSuccess, sessionError }) {
       setIsSubmitting(true)
       setFormError('')
 
-      // Aqui ocurre la conexion real con el backend Express.
+      // La API devuelve token + usuario. App se encarga de persistir la sesión y cargar datos protegidos.
       const { data } = await api.post('/auth/login', {
         email: formData.email,
         password: formData.password
       })
 
-      // Si el login sale bien, avisamos a App para que guarde token y usuario.
-      onLoginSuccess(data)
+      // App persiste la sesion y luego navegamos al dashboard.
+      await onLoginSuccess(data)
+      navigate('/dashboard', { replace: true })
     } catch (error) {
       setFormError(getApiErrorMessage(error, 'No fue posible iniciar sesion'))
     } finally {
@@ -49,58 +55,69 @@ function Login({ onLoginSuccess, sessionError }) {
   }
 
   return (
-    <div className="glass-card">
-      <p className="eyebrow mb-2">Acceso seguro</p>
-      <h2 className="panel-title">Inicia sesion</h2>
-      <p className="panel-copy">
-        Usa el endpoint real del backend para obtener tu token JWT y validar la
-        sesion del usuario.
-      </p>
-
-      <form className="auth-form" onSubmit={handleSubmit}>
-        <div>
-          <label className="form-label" htmlFor="email">
-            Email
-          </label>
-          <input
-            id="email"
-            name="email"
-            type="email"
-            className="form-control form-control-lg"
-            placeholder="tuemail@correo.com"
-            value={formData.email}
-            onChange={handleChange}
-            autoComplete="email"
-          />
+    <main className="app-shell">
+      <section className="auth-wrapper">
+        <div className="app-intro">
+          <p className="eyebrow">Acceso</p>
+          <h1 className="hero-title">Inicia sesion</h1>
+          <p className="hero-copy">
+            Accede a tu espacio de trabajo para consultar tu informacion y tus proyectos.
+          </p>
         </div>
 
-        <div>
-          <label className="form-label" htmlFor="password">
-            Password
-          </label>
-          <input
-            id="password"
-            name="password"
-            type="password"
-            className="form-control form-control-lg"
-            placeholder="Minimo 6 caracteres"
-            value={formData.password}
-            onChange={handleChange}
-            autoComplete="current-password"
-          />
+        <div className="glass-card">
+          <p className="eyebrow mb-2">Cuenta</p>
+          <h2 className="panel-title">Inicia sesion</h2>
+          <p className="panel-copy">
+            Ingresa con tu correo y tu password para entrar al panel.
+          </p>
+
+          <form className="auth-form" onSubmit={handleSubmit}>
+            <div>
+              <label className="form-label" htmlFor="email">
+                Email
+              </label>
+              <input
+                id="email"
+                name="email"
+                type="email"
+                className="form-control form-control-lg"
+                placeholder="tuemail@correo.com"
+                value={formData.email}
+                onChange={handleChange}
+                autoComplete="email"
+              />
+            </div>
+
+            <div>
+              <label className="form-label" htmlFor="password">
+                Password
+              </label>
+              <input
+                id="password"
+                name="password"
+                type="password"
+                className="form-control form-control-lg"
+                placeholder="Minimo 6 caracteres"
+                value={formData.password}
+                onChange={handleChange}
+                autoComplete="current-password"
+              />
+            </div>
+
+            {(formError || sessionError) && (
+              <div className="alert alert-danger mb-0" role="alert">
+                {formError || sessionError}
+              </div>
+            )}
+
+            <button type="submit" className="btn btn-accent btn-lg w-100" disabled={isSubmitting}>
+              {isSubmitting ? 'Validando credenciales...' : 'Entrar al sistema'}
+            </button>
+          </form>
         </div>
-
-        {(formError || sessionError) && (
-          <div className="alert alert-danger mb-0" role="alert">
-            {formError || sessionError}
-          </div>
-        )}
-
-        <button type="submit" className="btn btn-accent btn-lg w-100" disabled={isSubmitting}>
-          {isSubmitting ? 'Validando credenciales...' : 'Entrar al sistema'}
-        </button>
-      </form>
-    </div>
+      </section>
+    </main>
   )
 }
 

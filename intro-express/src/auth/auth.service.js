@@ -1,10 +1,6 @@
-// Esta capa concentra la lógica de autenticación.
-// No conoce req/res ni responde HTTP directamente.
-// Su trabajo es:
-// 1) validar datos básicos
-// 2) consultar usuarios en SQLite
-// 3) hashear contraseñas con bcrypt
-// 4) generar JWT con jsonwebtoken
+// Núcleo de autenticación del sistema.
+// Aquí viven las reglas reales de registro, login y lectura del usuario actual.
+// El controller solo traduce HTTP; el service decide validaciones, seguridad y contratos.
 
 // bcrypt protege contraseñas usando hashing seguro.
 const bcrypt = require('bcrypt')
@@ -14,8 +10,7 @@ const jwt = require('jsonwebtoken')
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 const MIN_PASSWORD_LENGTH = 6
 
-// Crea errores con status HTTP para que el controller pueda responder
-// sin mezclar lógica de negocio con la capa HTTP.
+// Los services lanzan errores con status para mantener separado negocio vs. transporte HTTP.
 const createAuthError = (status, message) => {
   const error = new Error(message)
   error.status = status
@@ -23,8 +18,8 @@ const createAuthError = (status, message) => {
   return error
 }
 
-// Elimina campos sensibles antes de devolver el usuario al cliente.
-// Así evitamos exponer password_hash por accidente.
+// Cualquier usuario que salga al cliente debe pasar por aquí.
+// Este helper evita fugas de password_hash y mantiene uniforme el contrato público del usuario.
 const sanitizeUser = (user) => {
   return {
     id: user.id,
@@ -35,8 +30,8 @@ const sanitizeUser = (user) => {
   }
 }
 
-// Registra un usuario nuevo.
-// Flujo: valida datos -> revisa email duplicado -> hashea password -> inserta usuario -> devuelve usuario limpio.
+// Flujo completo de registro:
+// valida contrato -> protege password con bcrypt -> inserta en SQLite -> devuelve usuario seguro.
 const registerUser = async (db, userData) => {
   const name = userData.name?.trim()
   const email = userData.email?.trim().toLowerCase()
@@ -78,8 +73,8 @@ const registerUser = async (db, userData) => {
   return sanitizeUser(createdUser)
 }
 
-// Devuelve el usuario autenticado actual usando el id guardado en el token.
-// Esto permite exponer un endpoint /me sin repetir lógica en el controller.
+// /auth/me depende de esta función.
+// El token ya fue validado por verifyAuth; aquí solo convertimos sub -> usuario real de base de datos.
 const getCurrentUser = async (db, userId) => {
   const user = await db.get(
     'SELECT * FROM users WHERE id = ?',
@@ -93,8 +88,8 @@ const getCurrentUser = async (db, userId) => {
   return sanitizeUser(user)
 }
 
-// Valida credenciales y devuelve un JWT firmado.
-// El token lleva datos mínimos del usuario para poder identificarlo en rutas protegidas.
+// Login verifica credenciales y firma un JWT con el mínimo contexto útil.
+// sub identifica al usuario; email y role permiten autorización y trazabilidad sin consultas extra inmediatas.
 const loginUser = async (db, credentials) => {
   const email = credentials.email?.trim().toLowerCase()
   const password = credentials.password

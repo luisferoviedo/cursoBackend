@@ -1,6 +1,5 @@
-// Este archivo no atiende requests HTTP.
-// Su única responsabilidad es abrir la base SQLite y preparar las tablas.
-// server.js llama a initDB() al arrancar la aplicación.
+// Capa de infraestructura de datos.
+// Este archivo no conoce Express ni rutas: solo prepara SQLite para que el resto del sistema la use.
 
 // Driver nativo de SQLite para Node.js.
 const sqlite3 = require('sqlite3')
@@ -17,8 +16,8 @@ async function connectDB() {
   })
 }
 
-// SQLite no soporta migraciones automáticas por sí solo.
-// Aqui ayuda agregar columnas nuevas cuando la tabla ya existía en una versión anterior.
+// SQLite no trae migraciones automáticas.
+// Este helper permite evolucionar el esquema sin romper bases creadas en versiones previas.
 async function ensureColumnExists(db, tableName, columnName, definition) {
   const columns = await db.all(`PRAGMA table_info(${tableName})`)
   const columnExists = columns.some((column) => column.name === columnName)
@@ -32,7 +31,8 @@ async function ensureColumnExists(db, tableName, columnName, definition) {
   )
 }
 
-// Unifica valores de estado legacy para que la base persista un solo contrato.
+// Unifica valores de estado legacy para que la base persista un solo contrato canónico.
+// Así routes, services y frontend trabajan con pending / in_progress / done.
 async function normalizeStoredStatuses(db) {
   await db.exec(`
     UPDATE projects
@@ -53,8 +53,8 @@ async function normalizeStoredStatuses(db) {
   `)
 }
 
-// Inicializa la base: conecta y garantiza que existan las tablas base.
-// Si la tabla ya existe, SQLite no la vuelve a crear gracias a IF NOT EXISTS.
+// Inicializa la base y deja el esquema listo para correr la aplicación actual.
+// IF NOT EXISTS evita recrear tablas, y los helpers posteriores resuelven compatibilidad.
 async function initDB() {
   const db = await connectDB()
 

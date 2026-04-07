@@ -1,22 +1,24 @@
-# Project Management System - API
+# Project Management System
 
-API construida con `Express` y `SQLite` para practicar:
+Proyecto full-stack para practicar:
 
+- backend con `Express` y `SQLite`;
 - arquitectura por capas;
-- CRUD de `projects` y `tasks`;
 - autenticación con `JWT`;
 - autorización por roles;
-- validaciones y middlewares transversales.
+- frontend con `React` y `Vite`;
+- consumo de API con cliente autenticado e interceptores.
 
 ## Problema que resuelve
 
-Este proyecto sirve como base para aprender a construir una API backend con:
+Este proyecto sirve como base para aprender a construir una aplicación con backend y frontend conectados:
 
 - servidor HTTP con `Express`;
 - persistencia real con `SQLite`;
 - separación `routes -> controllers -> services -> database`;
 - autenticación modular con carpeta `auth`;
-- protección transversal de la API usando middlewares.
+- protección transversal de la API usando middlewares;
+- cliente React con login, dashboard y creación de proyectos.
 
 ## Stack actual
 
@@ -27,13 +29,17 @@ Este proyecto sirve como base para aprender a construir una API backend con:
 - jsonwebtoken
 - dotenv
 - Nodemon
+- React
+- Vite
+- Axios
+- React Router
 
 ## Arquitectura
 
 Flujo principal de la aplicación:
 
 ```text
-request
+request HTTP
 -> server.js
 -> middleware global / verifyAuth
 -> router
@@ -41,6 +47,17 @@ request
 -> service
 -> database
 -> response
+```
+
+Flujo principal del frontend autenticado:
+
+```text
+login
+-> App guarda token
+-> api interceptor agrega Authorization
+-> App valida /auth/me
+-> App carga /projects
+-> Dashboard renderiza datos y crea proyectos
 ```
 
 Separación actual:
@@ -52,11 +69,35 @@ Separación actual:
 - `src/auth/`: módulo de autenticación
 - `src/middleware/`: middlewares reutilizables
 - `src/database/`: conexión e inicialización de SQLite
+- `src/lib/api.jsx`: cliente HTTP del frontend con interceptores
+- `src/App.jsx`: orquestación de sesión y datos protegidos
+- `src/pages/`: pantallas del frontend
+- `src/routes/appRouter.jsx`: ruteo del frontend
 
 ## Instalación
 
 ```bash
 npm install
+```
+
+## Ejecución
+
+Backend en desarrollo:
+
+```bash
+npm run dev
+```
+
+Frontend en desarrollo:
+
+```bash
+npm run dev:front
+```
+
+Build de frontend:
+
+```bash
+npm run build:front
 ```
 
 ## Variables de entorno
@@ -69,21 +110,7 @@ JWT_SECRET=tu_clave_secreta
 JWT_EXPIRES_IN=1h
 ```
 
-## Scripts disponibles
-
-Modo desarrollo:
-
-```bash
-npm run dev
-```
-
-Modo normal:
-
-```bash
-npm start
-```
-
-Servidor disponible en:
+Servidor backend disponible en:
 
 ```text
 http://localhost:3000
@@ -108,6 +135,8 @@ Campos relevantes en `users`:
 - `created_at`
 - `role`
 
+Archivos derivados de SQLite como `database.sqlite-wal` y `database.sqlite-shm` no se versionan.
+
 ## Módulo Auth
 
 La autenticación está separada en:
@@ -130,6 +159,21 @@ Responsabilidades:
 Además existe:
 
 - `src/middleware/authorize.js`: autorización por roles
+
+## Frontend actual
+
+El frontend vive en `src/` y hoy implementa:
+
+- `login.jsx`: formulario controlado de acceso;
+- `dashboard.jsx`: vista autenticada con navbar, resumen de cuenta, lista de proyectos y formulario de creación;
+- `App.jsx`: restauración de sesión, carga de proyectos y coordinación de callbacks;
+- `api.jsx`: instancia de `axios` con interceptores para token y `401`.
+
+Contrato actual del frontend:
+
+- el token se persiste en `localStorage` bajo `auth_token`;
+- cada request protegida agrega `Authorization: Bearer ...` automáticamente;
+- un `401` en rutas protegidas limpia la sesión y devuelve al login.
 
 ## Autenticación y autorización
 
@@ -208,6 +252,20 @@ Body JSON:
 }
 ```
 
+Respuesta esperada:
+
+```json
+{
+  "token": "jwt",
+  "user": {
+    "id": 1,
+    "name": "Luis Fer",
+    "email": "luis@example.com",
+    "role": "user"
+  }
+}
+```
+
 ### Protegidos
 
 Todos estos endpoints requieren:
@@ -258,6 +316,45 @@ Body JSON:
 #### `DELETE /api/projects/:id`
 
 Elimina un proyecto.
+
+## Flujo de estudio recomendado
+
+Si quieres entender el proyecto por capas, léelo en este orden:
+
+1. `src/server.js`
+2. `src/database/db.js`
+3. `src/auth/auth.routes.js`
+4. `src/auth/auth.controller.js`
+5. `src/auth/auth.service.js`
+6. `src/auth/auth.middleware.js`
+7. `src/routes/projects.routes.js`
+8. `src/controllers/project.controller.js`
+9. `src/services/project.service.js`
+10. `src/routes/tasks.routes.js`
+11. `src/controllers/task.controller.js`
+12. `src/services/task.service.js`
+13. `src/lib/api.jsx`
+14. `src/App.jsx`
+15. `src/routes/appRouter.jsx`
+16. `src/pages/login.jsx`
+17. `src/pages/dashboard.jsx`
+
+## Qué comentar y qué no
+
+Conviene comentar:
+
+- responsabilidad del archivo;
+- flujo entre capas;
+- contratos de entrada y salida;
+- decisiones no obvias;
+- validaciones de negocio y seguridad.
+
+No conviene comentar:
+
+- sintaxis evidente;
+- nombres de variables obvios;
+- exports triviales;
+- líneas que el código ya explica por sí solo.
 
 Requiere rol `admin`.
 
