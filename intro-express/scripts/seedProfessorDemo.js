@@ -1,5 +1,5 @@
 const bcrypt = require('bcrypt')
-const { initDB } = require('../src/database/db')
+const { initDB } = require('../src/backend/database/db')
 
 const demoUsers = [
   {

@@ -1,8 +1,15 @@
 const { defineConfig } = require('vite')
 const react = require('@vitejs/plugin-react')
+const tailwindcss = require('@tailwindcss/vite').default
+const path = require('path')
 
 module.exports = defineConfig({
-  plugins: [react()],
+  resolve: {
+    alias: {
+      '@': path.resolve(__dirname, './src/frontend')
+    }
+  },
+  plugins: [react(), tailwindcss()],
   server: {
     proxy: {
       '/api': 'http://localhost:3000',

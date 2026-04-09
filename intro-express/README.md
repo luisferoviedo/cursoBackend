@@ -1,24 +1,22 @@
 # Project Management System
 
-Proyecto full-stack para practicar:
+Proyecto full-stack para practicar una arquitectura clara entre backend y frontend:
 
-- backend con `Express` y `SQLite`;
-- arquitectura por capas;
-- autenticación con `JWT`;
-- autorización por roles;
-- frontend con `React` y `Vite`;
-- consumo de API con cliente autenticado e interceptores.
+- backend con `Express` y `SQLite`
+- autenticación con `JWT`
+- autorización por roles
+- frontend con `React`, `Vite`, `Tailwind` y `shadcn/ui`
+- organización por dominios (`auth`, `projects`, `tasks`)
 
-## Problema que resuelve
+## Qué resuelve
 
-Este proyecto sirve como base para aprender a construir una aplicación con backend y frontend conectados:
+Este proyecto permite:
 
-- servidor HTTP con `Express`;
-- persistencia real con `SQLite`;
-- separación `routes -> controllers -> services -> database`;
-- autenticación modular con carpeta `auth`;
-- protección transversal de la API usando middlewares;
-- cliente React con login, dashboard y creación de proyectos.
+- iniciar sesión con JWT
+- cargar proyectos protegidos
+- crear, editar y eliminar proyectos
+- entrar al detalle de un proyecto
+- crear, editar y eliminar tareas dentro de ese proyecto
 
 ## Stack actual
 
@@ -27,29 +25,57 @@ Este proyecto sirve como base para aprender a construir una aplicación con back
 - SQLite
 - bcrypt
 - jsonwebtoken
-- dotenv
-- Nodemon
 - React
 - Vite
 - Axios
 - React Router
+- Tailwind CSS
+- shadcn/ui
 
-## Arquitectura
+## Estructura actual
 
-Flujo principal de la aplicación:
+La estructura operativa real ya quedó separada en dos áreas:
+
+- `src/backend/`: backend real del proyecto
+- `src/frontend/`: frontend real del proyecto
+
+### Backend
+
+- `src/backend/server.js`: arranque del servidor y montaje de rutas
+- `src/backend/auth/`: login, register, `me` y middleware JWT
+- `src/backend/routes/`: definición de endpoints
+- `src/backend/controllers/`: capa HTTP
+- `src/backend/services/`: lógica de negocio
+- `src/backend/middleware/`: autorización, validaciones y logger
+- `src/backend/database/db.js`: conexión e inicialización de SQLite
+
+### Frontend
+
+- `src/frontend/main.jsx`: punto de entrada de React
+- `src/frontend/App.jsx`: estado global de sesión y proyectos
+- `src/frontend/routes/`: router y guard privado
+- `src/frontend/lib/api.jsx`: cliente Axios con interceptores
+- `src/frontend/components/ui/`: componentes base compartidos
+- `src/frontend/features/auth/screens/LoginScreen.jsx`: pantalla de login
+- `src/frontend/features/projects/screens/DashboardScreen.jsx`: dashboard
+- `src/frontend/features/tasks/screens/ProjectDetailScreen.jsx`: detalle del proyecto y tareas
+
+## Flujo principal
+
+### Backend
 
 ```text
 request HTTP
--> server.js
+-> src/backend/server.js
 -> middleware global / verifyAuth
--> router
+-> route
 -> controller
 -> service
 -> database
 -> response
 ```
 
-Flujo principal del frontend autenticado:
+### Frontend
 
 ```text
 login
@@ -57,22 +83,9 @@ login
 -> api interceptor agrega Authorization
 -> App valida /auth/me
 -> App carga /projects
--> Dashboard renderiza datos y crea proyectos
+-> Dashboard renderiza proyectos
+-> ProjectDetail gestiona tareas
 ```
-
-Separación actual:
-
-- `src/server.js`: arranque, middlewares globales y montaje de rutas
-- `src/routes/`: definición de endpoints
-- `src/controllers/`: capa HTTP
-- `src/services/`: lógica de negocio
-- `src/auth/`: módulo de autenticación
-- `src/middleware/`: middlewares reutilizables
-- `src/database/`: conexión e inicialización de SQLite
-- `src/lib/api.jsx`: cliente HTTP del frontend con interceptores
-- `src/App.jsx`: orquestación de sesión y datos protegidos
-- `src/pages/`: pantallas del frontend
-- `src/routes/appRouter.jsx`: ruteo del frontend
 
 ## Instalación
 
@@ -82,13 +95,13 @@ npm install
 
 ## Ejecución
 
-Backend en desarrollo:
+Backend:
 
 ```bash
 npm run dev
 ```
 
-Frontend en desarrollo:
+Frontend:
 
 ```bash
 npm run dev:front
@@ -98,6 +111,12 @@ Build de frontend:
 
 ```bash
 npm run build:front
+```
+
+Chequeo actual del proyecto:
+
+```bash
+npm test
 ```
 
 ## Variables de entorno
@@ -110,15 +129,22 @@ JWT_SECRET=tu_clave_secreta
 JWT_EXPIRES_IN=1h
 ```
 
-Servidor backend disponible en:
+## URLs locales
 
-```text
-http://localhost:3000
-```
+- frontend: `http://localhost:5173`
+- login: `http://localhost:5173/login`
+- dashboard: `http://localhost:5173/dashboard`
+- detalle de proyecto: `http://localhost:5173/projects/:projectId`
+- backend: `http://localhost:3000`
+- status: `http://localhost:3000/status`
 
 ## Base de datos
 
-La base se genera automáticamente en `database.sqlite`.
+La base principal vive en:
+
+```text
+database.sqlite
+```
 
 Tablas actuales:
 
@@ -126,364 +152,125 @@ Tablas actuales:
 - `projects`
 - `tasks`
 
-Campos relevantes en `users`:
-
-- `id`
-- `name`
-- `email`
-- `password_hash`
-- `created_at`
-- `role`
-
-Archivos derivados de SQLite como `database.sqlite-wal` y `database.sqlite-shm` no se versionan.
-
-## Módulo Auth
-
-La autenticación está separada en:
-
-```text
-src/auth/
-├── auth.routes.js
-├── auth.controller.js
-├── auth.service.js
-└── auth.middleware.js
-```
-
-Responsabilidades:
-
-- `auth.routes.js`: endpoints de auth
-- `auth.controller.js`: capa HTTP de auth
-- `auth.service.js`: registro, login y búsqueda del usuario actual
-- `auth.middleware.js`: validación de JWT
-
-Además existe:
-
-- `src/middleware/authorize.js`: autorización por roles
-
-## Frontend actual
-
-El frontend vive en `src/` y hoy implementa:
-
-- `login.jsx`: formulario controlado de acceso;
-- `dashboard.jsx`: vista autenticada con navbar, resumen de cuenta, lista de proyectos y formulario de creación;
-- `App.jsx`: restauración de sesión, carga de proyectos y coordinación de callbacks;
-- `api.jsx`: instancia de `axios` con interceptores para token y `401`.
-
-Contrato actual del frontend:
-
-- el token se persiste en `localStorage` bajo `auth_token`;
-- cada request protegida agrega `Authorization: Bearer ...` automáticamente;
-- un `401` en rutas protegidas limpia la sesión y devuelve al login.
+Archivos derivados como `database.sqlite-wal` y `database.sqlite-shm` no se versionan.
 
 ## Autenticación y autorización
 
 ### Autenticación
 
-Se usa `JWT` para autenticar usuarios.
+Se usa `JWT` para:
 
-- `register`: crea usuario con contraseña hasheada por `bcrypt`
-- `login`: valida credenciales y devuelve token
-- `me`: devuelve el usuario autenticado usando el token
+- `POST /api/auth/register`
+- `POST /api/auth/login`
+- `GET /api/auth/me`
 
 ### Autorización
 
-La API usa dos middlewares:
+La API combina dos capas:
 
 - `verifyAuth`: valida el token
-- `authorize(...roles)`: valida si el rol del usuario puede acceder
+- `authorize(...roles)`: valida el rol del usuario autenticado
 
 Reglas actuales:
 
 - `GET`, `POST`, `PUT` de `projects` y `tasks`: `user` o `admin`
-- `DELETE` de `projects` y `tasks`: solo `admin`
+- `DELETE` de `projects`: solo `admin`
+- `DELETE` de `tasks`: `user` o `admin`
 
-## Endpoints disponibles
+## Endpoints principales
 
 ### Públicos
 
-#### `GET /`
-
-Devuelve un mensaje de bienvenida.
-
-#### `GET /api`
-
-Devuelve información general de la API.
-
-#### `GET /status`
-
-Devuelve el estado del servidor.
-
-#### `POST /api/auth/register`
-
-Crea un usuario nuevo.
-
-Body JSON:
-
-```json
-{
-  "name": "Luis Fer",
-  "email": "luis@example.com",
-  "password": "123456"
-}
-```
-
-Respuesta esperada:
-
-```json
-{
-  "id": 1,
-  "name": "Luis Fer",
-  "email": "luis@example.com",
-  "role": "user",
-  "created_at": "2026-03-27 00:00:00"
-}
-```
-
-#### `POST /api/auth/login`
-
-Valida credenciales y devuelve token.
-
-Body JSON:
-
-```json
-{
-  "email": "luis@example.com",
-  "password": "123456"
-}
-```
-
-Respuesta esperada:
-
-```json
-{
-  "token": "jwt",
-  "user": {
-    "id": 1,
-    "name": "Luis Fer",
-    "email": "luis@example.com",
-    "role": "user"
-  }
-}
-```
+- `GET /`
+- `GET /api`
+- `GET /status`
+- `POST /api/auth/register`
+- `POST /api/auth/login`
 
 ### Protegidos
 
-Todos estos endpoints requieren:
+Todos requieren:
 
 ```text
 Authorization: Bearer TU_TOKEN
 ```
 
-#### `GET /api/auth/me`
+#### Proyectos
 
-Devuelve el usuario autenticado.
+- `GET /api/projects`
+- `GET /api/projects/:id`
+- `POST /api/projects`
+- `PUT /api/projects/:id`
+- `DELETE /api/projects/:id`
 
-#### `GET /api/projects`
+#### Tareas
 
-Lista proyectos.
-
-#### `GET /api/projects/:id`
-
-Obtiene un proyecto por id.
-
-#### `POST /api/projects`
-
-Crea un proyecto.
-
-Body JSON:
-
-```json
-{
-  "name": "Graphic Design",
-  "description": "Landing page y branding",
-  "status": "pending"
-}
-```
-
-#### `PUT /api/projects/:id`
-
-Actualiza un proyecto.
-
-Body JSON:
-
-```json
-{
-  "name": "Graphic Design",
-  "status": "in_progress"
-}
-```
-
-#### `DELETE /api/projects/:id`
-
-Elimina un proyecto.
+- `GET /api/projects/:projectId/tasks`
+- `GET /api/projects/:projectId/tasks/:id`
+- `POST /api/projects/:projectId/tasks`
+- `PUT /api/projects/:projectId/tasks/:id`
+- `DELETE /api/projects/:projectId/tasks/:id`
 
 ## Flujo de estudio recomendado
 
-Si quieres entender el proyecto por capas, léelo en este orden:
+Si quieres leer el proyecto por flujo:
 
-1. `src/server.js`
-2. `src/database/db.js`
-3. `src/auth/auth.routes.js`
-4. `src/auth/auth.controller.js`
-5. `src/auth/auth.service.js`
-6. `src/auth/auth.middleware.js`
-7. `src/routes/projects.routes.js`
-8. `src/controllers/project.controller.js`
-9. `src/services/project.service.js`
-10. `src/routes/tasks.routes.js`
-11. `src/controllers/task.controller.js`
-12. `src/services/task.service.js`
-13. `src/lib/api.jsx`
-14. `src/App.jsx`
-15. `src/routes/appRouter.jsx`
-16. `src/pages/login.jsx`
-17. `src/pages/dashboard.jsx`
+1. `src/backend/server.js`
+2. `src/backend/database/db.js`
+3. `src/backend/auth/auth.routes.js`
+4. `src/backend/auth/auth.controller.js`
+5. `src/backend/auth/auth.service.js`
+6. `src/backend/auth/auth.middleware.js`
+7. `src/backend/routes/projects.routes.js`
+8. `src/backend/controllers/project.controller.js`
+9. `src/backend/services/project.service.js`
+10. `src/backend/routes/tasks.routes.js`
+11. `src/backend/controllers/task.controller.js`
+12. `src/backend/services/task.service.js`
+13. `src/frontend/lib/api.jsx`
+14. `src/frontend/App.jsx`
+15. `src/frontend/routes/appRouter.jsx`
+16. `src/frontend/features/auth/screens/LoginScreen.jsx`
+17. `src/frontend/features/projects/screens/DashboardScreen.jsx`
+18. `src/frontend/features/tasks/screens/ProjectDetailScreen.jsx`
 
-## Qué comentar y qué no
+## Scripts útiles
 
-Conviene comentar:
-
-- responsabilidad del archivo;
-- flujo entre capas;
-- contratos de entrada y salida;
-- decisiones no obvias;
-- validaciones de negocio y seguridad.
-
-No conviene comentar:
-
-- sintaxis evidente;
-- nombres de variables obvios;
-- exports triviales;
-- líneas que el código ya explica por sí solo.
-
-Requiere rol `admin`.
-
-#### `GET /api/projects/:projectId/tasks`
-
-Lista tareas de un proyecto.
-
-#### `GET /api/projects/:projectId/tasks/:id`
-
-Obtiene una tarea puntual.
-
-#### `POST /api/projects/:projectId/tasks`
-
-Crea una tarea dentro de un proyecto.
-
-Body JSON:
-
-```json
-{
-  "title": "Definir estructura visual",
-  "status": "pending"
-}
-```
-
-#### `PUT /api/projects/:projectId/tasks/:id`
-
-Actualiza una tarea.
-
-#### `DELETE /api/projects/:projectId/tasks/:id`
-
-Elimina una tarea.
-
-Requiere rol `user` o `admin`.
-
-## Estructura del proyecto
-
-```text
-intro-express/
-├── .env
-├── .gitignore
-├── package.json
-├── package-lock.json
-├── README.md
-├── server.js
-├── database.sqlite
-└── src/
-    ├── auth/
-    │   ├── auth.controller.js
-    │   ├── auth.middleware.js
-    │   ├── auth.routes.js
-    │   └── auth.service.js
-    ├── controllers/
-    │   ├── project.controller.js
-    │   └── task.controller.js
-    ├── database/
-    │   └── db.js
-    ├── middleware/
-    │   ├── auth.js
-    │   ├── authorize.js
-    │   ├── logger.js
-    │   ├── validateOptionalStatus.js
-    │   ├── validateProject.js
-    │   ├── validateProjectUpdate.js
-    │   ├── validateStatus.js
-    │   ├── validateTask.js
-    │   └── validateTaskUpdate.js
-    ├── routes/
-    │   ├── projects.routes.js
-    │   └── tasks.routes.js
-    ├── services/
-    │   ├── project.service.js
-    │   └── task.service.js
-    └── server.js
-```
-
-## Flujo de trabajo con Bruno
-
-Orden recomendado para probar:
-
-1. `POST /api/auth/register`
-2. `POST /api/auth/login`
-3. copiar el `token`
-4. `GET /api/auth/me`
-5. `GET /api/projects`
-6. `POST /api/projects`
-7. `GET /api/projects/:projectId/tasks`
-
-Header para endpoints protegidos:
-
-```text
-Authorization: Bearer TU_TOKEN
-```
+- `npm run dev`: backend en desarrollo
+- `npm run dev:front`: frontend en desarrollo
+- `npm run build:front`: build de producción del frontend
+- `npm test`: chequeo sintáctico actual
+- `npm run recreate:tasks`: recrea la tabla `tasks`
+- `npm run seed:professor`: inserta datos demo
 
 ## Verificación manual
 
 Checklist reproducible:
 
-1. Ejecutar `npm run dev`.
-2. Confirmar en terminal `Database ready`.
-3. Confirmar en terminal `Servidor running http://localhost:3000`.
-4. Registrar un usuario con `POST /api/auth/register`.
-5. Hacer login con `POST /api/auth/login`.
-6. Copiar el token y probar `GET /api/auth/me`.
-7. Confirmar que `GET /api/projects` sin token responde `401`.
-8. Confirmar que `GET /api/projects` con token responde `200`.
-9. Confirmar que `DELETE /api/projects/:id` con rol `user` responde `403`.
-10. Confirmar que los responses nunca devuelven `password_hash`.
-
-## Ideas de prueba
-
-- Prueba unitaria:
-  validar que `getValidNumericParam` rechace ids malformados como `1abc`.
-- Prueba de integración:
-  registrar usuario, hacer login y consumir `/api/projects` con el token recibido.
-- QA manual:
-  probar con Bruno el flujo `register -> login -> me -> projects`.
+1. correr `npm run dev`
+2. correr `npm run dev:front`
+3. entrar a `/login`
+4. iniciar sesión
+5. confirmar carga de proyectos en dashboard
+6. entrar a un proyecto
+7. confirmar listado de tareas
+8. crear, editar y eliminar una tarea
+9. validar permisos de borrado de proyecto según rol
 
 ## Estado actual
 
 Hoy el proyecto ya resuelve:
 
-- CRUD de proyectos y tareas
-- autenticación con JWT
-- autorización por roles
-- ruta `GET /api/auth/me`
-- protección transversal de módulos privados
+- login con JWT
+- restauración de sesión en frontend
+- CRUD de proyectos
+- CRUD de tareas dentro de proyectos
+- separación real `src/backend` / `src/frontend`
+- organización frontend por `features`
 
 Pendiente recomendado para una versión más fuerte:
 
-- asociar `projects` al usuario autenticado con `user_id`
-- filtrar datos por ownership
-- diferenciar mejor permisos de `admin` y `user`
+- asociar proyectos al usuario autenticado
+- filtrar por ownership
+- agregar pruebas frontend reales para `.jsx`
+- cerrar la consolidación final del árbol git tras la migración

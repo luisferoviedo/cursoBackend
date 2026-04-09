@@ -1,0 +1,34 @@
+@import "tailwindcss";
+
+:root {
+  --bg-page: #f4f7f6;
+  --bg-surface: #fffdf9;
+  --bg-glow-top: rgba(246, 231, 216, 0.42);
+  --bg-glow-bottom: rgba(217, 241, 235, 0.48);
+  --text-primary: #24333a;
+  --text-secondary: #5f737a;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  min-height: 100%;
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+  min-height: 100vh;
+  font-family: "Avenir Next", "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  color: var(--text-primary);
+  background:
+    radial-gradient(circle at top left, var(--bg-glow-top), transparent 34%),
+    radial-gradient(circle at bottom right, var(--bg-glow-bottom), transparent 42%),
+    linear-gradient(180deg, var(--bg-surface) 0%, var(--bg-page) 100%);
+}
+
+#root {
+  min-height: 100vh;
+}

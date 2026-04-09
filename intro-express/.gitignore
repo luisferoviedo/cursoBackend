@@ -6,14 +6,16 @@ node_modules/
 .env.*
 !.env.example
 
-# Base de datos local
+# Base de datos local y artefactos SQLite
 database.sqlite
 database.sqlite-journal
-database.sqlite-shm
-database.sqlite-wal
+database.sqlite-*
+*.sqlite-shm
+*.sqlite-wal
 
-# Build de frontend
+# Build y cache de frontend
 dist/
+.vite/
 
 # Logs
 logs/
@@ -27,15 +29,15 @@ pnpm-debug.log*
 coverage/
 .nyc_output/
 
-# Archivos del sistema
-.DS_Store
-Thumbs.db
-
 # Configuración local de editores
 .vscode/
 .idea/
 
-# Archivos temporales
+# Archivos del sistema
+.DS_Store
+Thumbs.db
+
+# Temporales
 tmp/
 temp/
 *.tmp

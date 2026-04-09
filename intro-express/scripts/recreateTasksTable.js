@@ -1,4 +1,4 @@
-const { connectDB } = require('../src/database/db')
+const { connectDB } = require('../src/backend/database/db')
 
 async function main() {
   const db = await connectDB()
